@@ -1,8 +1,6 @@
 // ============================================================
 // SCREEN: HomeScreen
-// ============================================================
-// Pantalla principal: header con el nombre del dominio
-// y lista de tarjetas usando ScrollView.
+// Dominio: Productora de Eventos
 // ============================================================
 
 import React from 'react';
@@ -13,66 +11,71 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native';
-import { Item } from '../types';
+import { EventItem } from '../types';
 import { ItemCard } from '../components/ItemCard';
-import { MOCK_ITEMS } from '../data/mockData';
+import { MOCK_EVENTS } from '../data/mockData';
 
 export function HomeScreen(): React.JSX.Element {
-  // TODO: Personaliza el título con el nombre de tu dominio
-  // Ejemplos: 'Mi Biblioteca', 'Farmacia Central', 'GymApp', 'Menú del Día'
-  const DOMAIN_TITLE = 'Mi App';
-  const DOMAIN_SUBTITLE = 'Subtítulo del dominio';
+  const DOMAIN_TITLE = 'Productora de Eventos';
+  const DOMAIN_SUBTITLE = 'Gestión de Producciones, Eventos & Logística';
 
-  /**
-   * Handles item card press.
-   * For now, just logs the item name. In week-03 we'll add navigation.
-   */
-  function handleItemPress(item: Item): void {
-    // TODO: Mostrar un alert o log con el nombre del item
-    console.log('Item seleccionado:', item.name);
+  function handleEventPress(event: EventItem): void {
+    console.log('Evento seleccionado:', event.name);
+    Alert.alert(
+      `🎉 ${event.name}`,
+      `Cliente: ${event.client}\nFecha: ${event.date}\nLugar: ${event.location}\nPresupuesto: ${event.budget}`,
+      [{ text: 'Entendido', style: 'default' }]
+    );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0d1117" />
 
-      {/* ============================================
-          TODO: Implementar el Header de la app
-          Debe mostrar: título del dominio y subtítulo
-          Usa flexDirection: 'column' o 'row' según el diseño
-          ============================================ */}
+      {/* Header principal del dominio */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{DOMAIN_TITLE}</Text>
-        <Text style={styles.headerSubtitle}>{DOMAIN_SUBTITLE}</Text>
+        <View style={styles.headerTitleContainer}>
+          <Text style={styles.headerBadge}>BC-REACTNATIVE • FICHA 3228970</Text>
+          <Text style={styles.headerTitle}>{DOMAIN_TITLE}</Text>
+          <Text style={styles.headerSubtitle}>{DOMAIN_SUBTITLE}</Text>
+        </View>
+
+        {/* Resumen rápido de eventos */}
+        <View style={styles.summaryBar}>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>{MOCK_EVENTS.length}</Text>
+            <Text style={styles.summaryLabel}>Eventos Activos</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>$202K USD</Text>
+            <Text style={styles.summaryLabel}>Presupuesto Total</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryValue}>27.850</Text>
+            <Text style={styles.summaryLabel}>Aforo Estimado</Text>
+          </View>
+        </View>
       </View>
 
-      {/* ============================================
-          TODO: Implementar la lista de tarjetas
-          Usa ScrollView para permitir scroll vertical
-          Renderiza un ItemCard por cada elemento en MOCK_ITEMS
-          ============================================ */}
+      {/* Lista de tarjetas con ScrollView */}
       <ScrollView
         style={styles.listContainer}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* TODO: Reemplaza este placeholder por el render real de las tarjetas */}
-        {/* Ejemplo de cómo renderizar la lista:
-        {MOCK_ITEMS.map((item) => (
+        <Text style={styles.sectionTitle}>Próximas Producciones</Text>
+
+        {MOCK_EVENTS.map((event) => (
           <ItemCard
-            key={item.id}
-            item={item}
-            onPress={handleItemPress}
+            key={event.id}
+            item={event}
+            onPress={handleEventPress}
           />
         ))}
-        */}
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>Lista de tarjetas — por implementar</Text>
-          <Text style={styles.emptyHint}>
-            Renderiza los {MOCK_ITEMS.length} items de MOCK_ITEMS usando ItemCard
-          </Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -83,46 +86,75 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0d1117',
   },
-
-  // Header — TODO: ajusta según el diseño de tu dominio
   header: {
     paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#30363d',
+    borderBottomColor: '#21262d',
+    backgroundColor: '#161b22',
+  },
+  headerTitleContainer: {
+    marginBottom: 12,
+  },
+  headerBadge: {
+    color: '#238636',
+    fontSize: 11,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#ffffff',
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#8b949e',
-    marginTop: 4,
+    marginTop: 2,
   },
-
-  // List
+  summaryBar: {
+    flexDirection: 'row',
+    backgroundColor: '#0d1117',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#30363d',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  summaryItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  summaryValue: {
+    color: '#58a6ff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  summaryLabel: {
+    color: '#8b949e',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  summaryDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#30363d',
+  },
   listContainer: {
     flex: 1,
   },
   listContent: {
     padding: 16,
   },
-
-  // Empty state placeholder — elimina cuando implementes la lista real
-  emptyState: {
-    alignItems: 'center',
-    paddingTop: 60,
-    gap: 8,
-  },
-  emptyText: {
-    color: '#8b949e',
+  sectionTitle: {
+    color: '#f0f6fc',
     fontSize: 16,
-  },
-  emptyHint: {
-    color: '#30363d',
-    fontSize: 13,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 14,
+    letterSpacing: 0.5,
   },
 });
