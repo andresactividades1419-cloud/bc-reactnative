@@ -1,6 +1,6 @@
 // ============================================================
 // SCREEN: HomeScreen (HomeList)
-// Dominio: Productora de Eventos (Semana 03)
+// Dominio: Productora de Eventos (Semana 04 - Zustand)
 // ============================================================
 
 import React, { useCallback } from 'react';
@@ -16,10 +16,14 @@ import {
 import { EventItem } from '../types';
 import { MOCK_EVENTS } from '../data/mockData';
 import { ItemCard } from '../components/ItemCard';
+import { useEventStore } from '../stores/useEventStore';
 import { HomeListScreenProps } from '../navigation/types';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
+import { COLORS, SPACING, TYPOGRAPHY } from '../theme';
 
 export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Element {
+  // Selector Zustand para obtener la cantidad de guardados en tiempo real
+  const savedCount = useEventStore((state) => state.savedEvents.length);
+
   const handleEventPress = useCallback(
     (item: EventItem) => {
       navigation.navigate('DetailScreen', {
@@ -49,8 +53,15 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
       <View style={styles.header}>
-        <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 03</Text>
-        <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
+        <View style={styles.headerTitleRow}>
+          <View style={styles.flexOne}>
+            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 04 (ZUSTAND)</Text>
+            <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
+          </View>
+          <View style={styles.savedChip}>
+            <Text style={styles.savedChipText}>⭐ {savedCount} Guardados</Text>
+          </View>
+        </View>
         <Text style={TYPOGRAPHY.headerSubtitle}>
           Catálogo General de Producciones & Eventos
         </Text>
@@ -81,11 +92,33 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  flexOne: {
+    flex: 1,
+  },
   badge: {
     color: COLORS.successLight,
     fontSize: 11,
     fontWeight: 'bold',
     marginBottom: 2,
+  },
+  savedChip: {
+    backgroundColor: COLORS.warningBg,
+    borderColor: COLORS.warning,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 4,
+  },
+  savedChipText: {
+    color: COLORS.warningLight,
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   separator: {
     height: SPACING.md,

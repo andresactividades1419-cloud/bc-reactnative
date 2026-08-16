@@ -1,42 +1,40 @@
-# Semana 03 — Productora de Eventos (React Navigation 7)
+# Semana 04 — Productora de Eventos (Estado Global con Zustand)
 
 > **Aprendiz:** ANDRES FELIPE FERNANDEZ CARDOZA  
 > **Ficha:** 3228970  
-> **Bootcamp:** `bc-reactnative` — Semana 03 (React Navigation 7)
+> **Bootcamp:** `bc-reactnative` — Semana 04 (Manejo de Estado Global con Zustand)
 
 ---
 
-## 🎯 Descripción del Dominio & Navegación
+## 🎯 Descripción del Dominio & Estado Global
 
-**Productora de Eventos**: Sistema móvil con navegación avanzada de dos niveles:
-- **Tab Navigator Principal (`RootTab`):** Pestaña de **Eventos** (`HomeTab`) y Pestaña de **Favoritos** (`FavoritesTab`).
-- **Stack Navigator Anidado (`HomeStack`):** Navegación de lista general (`HomeList`) a la **Ficha Técnica Detallada** (`DetailScreen`).
+**Productora de Eventos**: Sistema móvil con gestión de estado global centralizado usando **Zustand**:
+- **Store Centralizado (`src/stores/useEventStore.ts`):** Administra la lista de eventos guardados/destacados (`savedEvents`) a lo largo de toda la aplicación sin prop drilling.
+- **Acciones Implementadas:** `addEvent`, `removeEvent`, `toggleSaveEvent`, `clearSavedEvents`.
+- **Selectores Dinámicos:**
+  - Inyección en tiempo real del badge del Tab Bar (`tabBarBadge`) en la pestaña **Destacados**.
+  - Botones toggle de guardado interactivos en `ItemCard`, `HomeScreen` y `DetailScreen`.
+- **Moneda:** Todos los presupuestos se manejan en **Pesos Colombianos (COP)**.
 
 ---
 
 ## 🚀 Características Implementadas
 
-1. **`Tab Navigator` (`RootNavigator.tsx`):**
-   - Pestaña **Eventos** con icono `calendar-outline` de `@expo/vector-icons` (`Ionicons`).
-   - Pestaña **Favoritos** con icono `star-outline`.
-   - `tabBarActiveTintColor`: `#58a6ff` (Azul primario).
-2. **`Stack Navigator` Anidado (`HomeStack`):**
-   - Transición fluida de `HomeList` a `DetailScreen`.
-   - Paso de parámetros tipados (`id` y `name`).
-3. **Pantalla de Detalle (`DetailScreen.tsx`):**
-   - Lectura de parámetros mediante `route.params`.
-   - Ficha técnica completa del evento (cliente, categoría, fecha, locación, presupuesto, aforo, proveedores, personal asignado y contacto responsable).
-   - Botón de navegación para regresar (`goBack()`).
-4. **Pantalla de Favoritos (`FavoritesScreen.tsx`):**
-   - Lista de eventos prioritarios con navegación anidada hacia el detalle.
-5. **Tipado Estricto con TypeScript:**
-   - `HomeStackParamList`, `RootTabParamList`.
-   - `NativeStackScreenProps` y `CompositeScreenProps`.
-   - Sin uso de `any`.
+1. **Zustand Store (`useEventStore.ts`):**
+   - Tipado 100% estricto en TypeScript sin uso de `any`.
+   - Modificación y lectura directa mediante selectores atómicos.
+2. **Badge Dinámico en el Tab Bar:**
+   - La pestaña **Destacados** reacciona automáticamente al conteo del store Zustand (`savedCount`) mostrando un badge sin necesidad de estados globales pesados o Context API.
+3. **Pestaña Destacados (`SavedScreen` / `FavoritesScreen`):**
+   - Muestra la lista de producciones marcadas desde cualquier pantalla.
+   - Botón **"Limpiar Todo 🗑️"** que ejecuta la acción `clearSavedEvents()` del store.
+   - Estado vacío interactivo cuando no hay elementos.
+4. **Ficha Técnica (`DetailScreen.tsx`):**
+   - Botón toggle dinámico que lee y modifica el store Zustand.
 
 ---
 
 ## 🎨 Decisiones de Diseño
 
-- **Navegación Intuitiva:** El Tab Bar se mantiene visible para cambiar de contexto rápidamente, mientras el Stack administra el flujo dentro del catálogo.
-- **Iconografía Consistente:** Uso de `@expo/vector-icons` integrado con la paleta de colores Dark Mode.
+- **Arquitectura Limpia:** Separación entre pantallas (`src/screens/`), stores (`src/stores/`), componentes visuales (`src/components/`) y tipos (`src/types/`).
+- **Aesthetic Dark Theme:** Colores adaptados con jerarquía visual, bordes sutiles y contraste de acentos en amarillo para elementos destacados.
