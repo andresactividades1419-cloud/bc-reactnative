@@ -1,6 +1,6 @@
 // ============================================================
 // COMPONENT: ItemCard (EventCard)
-// Dominio: Productora de Eventos
+// Dominio: Productora de Eventos (Semana 04 - Zustand)
 // ============================================================
 
 import React from 'react';
@@ -12,6 +12,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { EventItem } from '../types';
+import { useEventStore } from '../stores/useEventStore';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
 
 interface ItemCardProps {
@@ -23,6 +24,12 @@ export const ItemCard = React.memo(function ItemCard({
   item,
   onPress,
 }: ItemCardProps): React.JSX.Element {
+  // Selector Zustand para verificar si está en la lista de destacados
+  const isSaved = useEventStore((state) =>
+    state.savedEvents.some((evt) => evt.id === item.id)
+  );
+  const toggleSaveEvent = useEventStore((state) => state.toggleSaveEvent);
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -31,11 +38,25 @@ export const ItemCard = React.memo(function ItemCard({
       ]}
       onPress={() => onPress(item)}
     >
-      <Image
-        source={{ uri: item.imageUri }}
-        style={styles.cardImage}
-        resizeMode="cover"
-      />
+      <View style={styles.imageWrapper}>
+        <Image
+          source={{ uri: item.imageUri }}
+          style={styles.cardImage}
+          resizeMode="cover"
+        />
+        {/* Botón rápido de Zustand sobre la imagen */}
+        <Pressable
+          style={[styles.bookmarkBadge, isSaved && styles.bookmarkBadgeActive]}
+          onPress={(e) => {
+            e.stopPropagation();
+            toggleSaveEvent(item);
+          }}
+        >
+          <Text style={styles.bookmarkBadgeText}>
+            {isSaved ? '⭐ Guardado' : '☆ Guardar'}
+          </Text>
+        </Pressable>
+      </View>
 
       <View style={styles.cardContent}>
         <View style={styles.badgesRow}>
@@ -74,11 +95,11 @@ export const ItemCard = React.memo(function ItemCard({
 
         <View style={styles.footerRow}>
           <View>
-            <Text style={TYPOGRAPHY.caption}>Presupuesto</Text>
+            <Text style={TYPOGRAPHY.caption}>Presupuesto (COP)</Text>
             <Text style={styles.budgetValue}>{item.budget}</Text>
           </View>
           <View style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>Ver Ficha Completa →</Text>
+            <Text style={styles.actionButtonText}>Ver Ficha →</Text>
           </View>
         </View>
       </View>
@@ -98,9 +119,34 @@ const styles = StyleSheet.create({
     opacity: 0.88,
     borderColor: COLORS.primaryLight,
   },
-  cardImage: {
+  imageWrapper: {
     width: '100%',
     height: 160,
+    position: 'relative',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  bookmarkBadge: {
+    position: 'absolute',
+    top: SPACING.sm,
+    right: SPACING.sm,
+    backgroundColor: 'rgba(13, 17, 23, 0.85)',
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: 4,
+    borderRadius: RADIUS.full,
+  },
+  bookmarkBadgeActive: {
+    backgroundColor: COLORS.warningBg,
+    borderColor: COLORS.warning,
+  },
+  bookmarkBadgeText: {
+    color: COLORS.white,
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   cardContent: {
     padding: SPACING.lg,
@@ -178,7 +224,7 @@ const styles = StyleSheet.create({
   },
   budgetValue: {
     color: COLORS.successLight,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   actionButton: {

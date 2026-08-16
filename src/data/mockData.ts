@@ -1,6 +1,6 @@
 // ============================================================
 // MOCK DATA — src/data/mockData.ts
-// Dominio: Productora de Eventos (Moneda: Pesos Colombianos COP)
+// Dominio: Productora de Eventos (Pesos Colombianos COP)
 // ============================================================
 
 import { EventItem } from '../types';
@@ -22,7 +22,6 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Montaje de festival de música electrónica y arte digital con más de 20 artistas internacionales. Incluye diseño de escenarios principales, pirotecnia y sistema de iluminación láser.',
     contactPerson: 'Carlos Mendoza (Director de Logística)',
     contactEmail: 'cmendoza@livenation.co',
-    isFavorite: true,
   },
   {
     id: 'evt-102',
@@ -40,7 +39,6 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Evento corporativo de tecnología e innovación con keynotes internacionales, área comercial de networking y cena de gala empresarial.',
     contactPerson: 'Laura Restrepo (VP de Eventos Globant)',
     contactEmail: 'laura.restrepo@globant.com',
-    isFavorite: true,
   },
   {
     id: 'evt-103',
@@ -58,7 +56,6 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Boda al aire libre con montaje de carpas transparentes, banquete gourmet de 4 tiempos, ensamble de violines y show de fuegos fríos.',
     contactPerson: 'Andrés Cardoza (Contratante)',
     contactEmail: 'acardoza@eventos.com',
-    isFavorite: true,
   },
   {
     id: 'evt-104',
@@ -76,7 +73,6 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Exposición comercial e industrial de 3 días con más de 120 stands interactivos, auditorio de ponencias y zona gastronómica.',
     contactPerson: 'Mariana Gómez (Coordinadora CCB)',
     contactEmail: 'mgomez@ccb.org.co',
-    isFavorite: false,
   },
   {
     id: 'evt-105',
@@ -94,7 +90,6 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Gran concierto de rock con bandas legendarias de América Latina. Pantallas LED gigantes curvos, sonido L-Acoustics K1 y logística de aforo masivo.',
     contactPerson: 'Felipe Jaramillo (Director de Producción)',
     contactEmail: 'faramillo@paramo.co',
-    isFavorite: true,
   },
   {
     id: 'evt-106',
@@ -112,7 +107,6 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Lanzamiento exclusivo del nuevo modelo eléctrico BMW iX para clientes VIP y prensa automotriz. Escenario 360 grados y cóctel de autor.',
     contactPerson: 'Santiago Morales (Gerente de Marketing)',
     contactEmail: 'smorales@bmw.com.co',
-    isFavorite: false,
   },
 ];
 
