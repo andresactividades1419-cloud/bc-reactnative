@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Productora de Eventos - Semana 02",
-    "slug": "bc-reactnative-semana-02",
+    "name": "Productora de Eventos - Semana 03",
+    "slug": "bc-reactnative-semana-03",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,14 +13,14 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.productoraeventos.semana02"
+      "bundleIdentifier": "com.productoraeventos.semana03"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0d1117"
       },
-      "package": "com.productoraeventos.semana02"
+      "package": "com.productoraeventos.semana03"
     },
     "sdkVersion": "53.0.0"
   }
