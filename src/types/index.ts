@@ -1,6 +1,6 @@
 // ============================================================
 // TYPES — src/types/index.ts
-// Dominio: Productora de Eventos (bc-reactnative)
+// Dominio: Productora de Eventos
 // ============================================================
 
 export type EventCategory = 'Todos' | 'Concierto' | 'Boda' | 'Conferencia' | 'Corporativo' | 'Festival';
@@ -19,7 +19,10 @@ export interface EventItem {
   status: EventStatus;
   vendorsCount: number;
   staffCount: number;
-  featured?: boolean;
+  description: string;
+  contactPerson: string;
+  contactEmail: string;
+  isFavorite?: boolean;
 }
 
 export type Item = EventItem;
