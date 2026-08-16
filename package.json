@@ -1,5 +1,5 @@
 {
-  "name": "semana-03-proyecto",
+  "name": "semana-04-proyecto",
   "version": "1.0.0",
   "main": "expo/AppEntry",
   "scripts": {
@@ -20,7 +20,8 @@
     "react-native": "0.86.0",
     "react-native-safe-area-context": "^5.3.0",
     "react-native-screens": "^4.10.0",
-    "react-native-web": "^0.20.0"
+    "react-native-web": "^0.20.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "7.29.7",

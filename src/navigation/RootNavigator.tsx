@@ -1,6 +1,6 @@
 // ============================================================
 // ROOT NAVIGATOR — src/navigation/RootNavigator.tsx
-// React Navigation 7 (Tab + Stack Anidado)
+// React Navigation 7 + Zustand Store Integration
 // ============================================================
 
 import React from 'react';
@@ -10,13 +10,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { RootTabParamList, HomeStackParamList } from './types';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DetailScreen } from '../screens/DetailScreen';
-import { FavoritesScreen } from '../screens/FavoritesScreen';
+import { SavedScreen } from '../screens/FavoritesScreen';
+import { useEventStore } from '../stores/useEventStore';
 import { COLORS } from '../theme';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-// Stack Navigator de la pestaña Home
 function HomeStackNavigator(): React.JSX.Element {
   return (
     <Stack.Navigator
@@ -38,17 +38,16 @@ function HomeStackNavigator(): React.JSX.Element {
       <Stack.Screen
         name="DetailScreen"
         component={DetailScreen}
-        options={({ route }) => ({
-          title: route.params.name,
-          headerShown: false,
-        })}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
 }
 
-// Tab Navigator Principal
 export function RootNavigator(): React.JSX.Element {
+  // Selector Zustand para el badge dinámico en tiempo real (sin prop drilling)
+  const savedCount = useEventStore((state) => state.savedEvents.length);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -75,10 +74,17 @@ export function RootNavigator(): React.JSX.Element {
         }}
       />
       <Tab.Screen
-        name="FavoritesTab"
-        component={FavoritesScreen}
+        name="SavedTab"
+        component={SavedScreen}
         options={{
-          tabBarLabel: 'Favoritos',
+          tabBarLabel: 'Destacados',
+          tabBarBadge: savedCount > 0 ? savedCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: COLORS.warning,
+            color: COLORS.background,
+            fontWeight: 'bold',
+            fontSize: 11,
+          },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star-outline" size={size} color={color} />
           ),

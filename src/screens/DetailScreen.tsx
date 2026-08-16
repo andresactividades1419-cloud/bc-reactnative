@@ -1,6 +1,6 @@
 // ============================================================
 // SCREEN: DetailScreen
-// Dominio: Productora de Eventos (Semana 03)
+// Dominio: Productora de Eventos (Semana 04 - Zustand)
 // ============================================================
 
 import React from 'react';
@@ -16,7 +16,8 @@ import {
 } from 'react-native';
 import { DetailScreenProps } from '../navigation/types';
 import { MOCK_EVENTS } from '../data/mockData';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
+import { useEventStore } from '../stores/useEventStore';
+import { COLORS, SPACING, RADIUS } from '../theme';
 
 export function DetailScreen({ route, navigation }: DetailScreenProps): React.JSX.Element {
   const { id, name } = route.params;
@@ -29,7 +30,7 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
     category: 'Corporativo' as const,
     date: 'Sin fecha',
     location: 'Sin ubicación',
-    budget: '$0 USD',
+    budget: '$ 0 COP',
     capacity: 0,
     imageUri: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
     status: 'Planificación' as const,
@@ -39,6 +40,12 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
     contactPerson: 'No asignado',
     contactEmail: 'contacto@eventos.co',
   };
+
+  // Selector y acción de Zustand
+  const isSaved = useEventStore((state) =>
+    state.savedEvents.some((evt) => evt.id === event.id)
+  );
+  const toggleSaveEvent = useEventStore((state) => state.toggleSaveEvent);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -55,13 +62,25 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
 
         {/* Ficha del evento */}
         <View style={styles.body}>
-          <View style={styles.badgesRow}>
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryBadgeText}>{event.category}</Text>
+          <View style={styles.topRow}>
+            <View style={styles.badgesRow}>
+              <View style={styles.categoryBadge}>
+                <Text style={styles.categoryBadgeText}>{event.category}</Text>
+              </View>
+              <View style={styles.statusBadge}>
+                <Text style={styles.statusBadgeText}>{event.status}</Text>
+              </View>
             </View>
-            <View style={styles.statusBadge}>
-              <Text style={styles.statusBadgeText}>{event.status}</Text>
-            </View>
+
+            {/* Botón principal de Zustand: Agregar / Quitar de Destacados */}
+            <Pressable
+              style={[styles.saveButton, isSaved && styles.saveButtonActive]}
+              onPress={() => toggleSaveEvent(event)}
+            >
+              <Text style={styles.saveButtonText}>
+                {isSaved ? '⭐ Quitar de Destacados' : '☆ Guardar en Destacados'}
+              </Text>
+            </Pressable>
           </View>
 
           <Text style={styles.title}>{event.name}</Text>
@@ -84,7 +103,7 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
               <Text style={styles.gridValue}>{event.location}</Text>
             </View>
             <View style={styles.gridItem}>
-              <Text style={styles.gridLabel}>💰 PRESUPUESTO</Text>
+              <Text style={styles.gridLabel}>💰 PRESUPUESTO (COP)</Text>
               <Text style={styles.budgetValue}>{event.budget}</Text>
             </View>
             <View style={styles.gridItem}>
@@ -154,10 +173,15 @@ const styles = StyleSheet.create({
   body: {
     padding: SPACING.lg,
   },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
   badgesRow: {
     flexDirection: 'row',
-    gap: SPACING.sm,
-    marginBottom: SPACING.sm,
+    gap: SPACING.xs,
   },
   categoryBadge: {
     backgroundColor: COLORS.primaryBg,
@@ -185,6 +209,23 @@ const styles = StyleSheet.create({
     color: COLORS.successLight,
     fontSize: 11,
     fontWeight: '700',
+  },
+  saveButton: {
+    backgroundColor: COLORS.surfaceLight,
+    borderColor: COLORS.borderLight,
+    borderWidth: 1,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: SPACING.xs,
+  },
+  saveButtonActive: {
+    backgroundColor: COLORS.warningBg,
+    borderColor: COLORS.warning,
+  },
+  saveButtonText: {
+    color: COLORS.textPrimary,
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 24,
