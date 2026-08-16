@@ -1,43 +1,67 @@
 // ============================================================
 // MOCK DATA — src/data/mockData.ts
-// ============================================================
-// Datos de ejemplo para tu dominio asignado.
-// Reemplaza estos datos con información coherente a tu dominio.
+// Dominio: Productora de Eventos
 // ============================================================
 
-import { Item } from '../types';
+import { EventItem } from '../types';
 
-// TODO: Reemplaza los valores por datos reales de tu dominio
-// Usa imágenes representativas — puedes usar URLs de picsum.photos
-// o incluir imágenes locales en assets/
-
-export const MOCK_ITEMS: Item[] = [
+export const MOCK_EVENTS: EventItem[] = [
   {
-    id: '1',
-    name: 'Nombre del elemento 1',
-    subtitle: 'Subtítulo o descripción corta',
-    imageUri: 'https://picsum.photos/seed/item1/300/200',
-    // TODO: Agrega las propiedades específicas de tu dominio
+    id: 'evt-01',
+    name: 'Festival Neon Lights 2026',
+    client: 'LiveNation Colombia',
+    category: 'Festival',
+    date: '25 de Octubre, 2026',
+    location: 'Centro de Eventos Valle del Pacífico',
+    budget: '$85,000 USD',
+    capacity: 18000,
+    imageUri: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
+    status: 'En Producción',
+    vendorsCount: 12,
+    staffCount: 45,
   },
   {
-    id: '2',
-    name: 'Nombre del elemento 2',
-    subtitle: 'Subtítulo o descripción corta',
-    imageUri: 'https://picsum.photos/seed/item2/300/200',
-    // TODO: Agrega las propiedades específicas de tu dominio
+    id: 'evt-02',
+    name: 'Gala Anual Tech Summit',
+    client: 'Globant Enterprise',
+    category: 'Conferencia',
+    date: '12 de Noviembre, 2026',
+    location: 'Hotel Grand Hyatt, Bogotá',
+    budget: '$32,000 USD',
+    capacity: 1500,
+    imageUri: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+    status: 'Confirmado',
+    vendorsCount: 6,
+    staffCount: 18,
   },
   {
-    id: '3',
-    name: 'Nombre del elemento 3',
-    subtitle: 'Subtítulo o descripción corta',
-    imageUri: 'https://picsum.photos/seed/item3/300/200',
-    // TODO: Agrega las propiedades específicas de tu dominio
+    id: 'evt-03',
+    name: 'Boda Real Cardoza & Silva',
+    client: 'Familia Cardoza',
+    category: 'Boda',
+    date: '05 de Diciembre, 2026',
+    location: 'Hacienda San Rafael, Sopó',
+    budget: '$25,000 USD',
+    capacity: 350,
+    imageUri: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+    status: 'Planificación',
+    vendorsCount: 8,
+    staffCount: 14,
   },
   {
-    id: '4',
-    name: 'Nombre del elemento 4',
-    subtitle: 'Subtítulo o descripción corta',
-    imageUri: 'https://picsum.photos/seed/item4/300/200',
-    // TODO: Agrega las propiedades específicas de tu dominio
+    id: 'evt-04',
+    name: 'Expo Industria & Innovación',
+    client: 'Cámara de Comercio de Bogotá',
+    category: 'Corporativo',
+    date: '18 de Enero, 2027',
+    location: 'Pabellón 6 - Corferias, Bogotá',
+    budget: '$60,000 USD',
+    capacity: 8000,
+    imageUri: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+    status: 'Confirmado',
+    vendorsCount: 15,
+    staffCount: 30,
   },
 ];
+
+export const MOCK_ITEMS = MOCK_EVENTS;

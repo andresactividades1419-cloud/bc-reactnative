@@ -1,21 +1,25 @@
 // ============================================================
 // TYPES — src/types/index.ts
-// ============================================================
-// Define aquí la interfaz del elemento de tu dominio asignado.
-// Este type se usará en mockData.ts, ItemCard.tsx y HomeScreen.tsx
+// Dominio: Productora de Eventos (bc-reactnative)
 // ============================================================
 
-// TODO: Renombra esta interfaz con el nombre de tu elemento
-// Ejemplos: Book, Medication, Member, Dish, Movie, Destination
-export interface Item {
+export type EventCategory = 'Concierto' | 'Boda' | 'Conferencia' | 'Corporativo' | 'Festival';
+export type EventStatus = 'Planificación' | 'En Producción' | 'Confirmado' | 'Finalizado';
+
+export interface EventItem {
   id: string;
   name: string;
+  client: string;
+  category: EventCategory;
+  date: string;
+  location: string;
+  budget: string;
+  capacity: number;
   imageUri: string;
-  // TODO: Agrega las propiedades específicas de tu dominio
-  // Ejemplos:
-  //   Biblioteca → author: string; year: number;
-  //   Farmacia → activeIngredient: string; price: number;
-  //   Gimnasio → plan: string; expiresAt: string;
-  //   Restaurante → price: number; description: string;
-  subtitle: string; // campo genérico de apoyo — personaliza según tu dominio
+  status: EventStatus;
+  vendorsCount: number;
+  staffCount: number;
 }
+
+// Alias para compatibilidad con la interfaz genérica del starter
+export type Item = EventItem;
