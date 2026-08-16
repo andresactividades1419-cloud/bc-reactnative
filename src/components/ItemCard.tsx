@@ -1,3 +1,8 @@
+// ============================================================
+// COMPONENT: ItemCard (EventCard)
+// Dominio: Productora de Eventos
+// ============================================================
+
 import React from 'react';
 import {
   View,
@@ -7,13 +12,17 @@ import {
   StyleSheet,
 } from 'react-native';
 import { EventItem } from '../types';
+import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
 
 interface ItemCardProps {
   item: EventItem;
   onPress: (item: EventItem) => void;
 }
 
-export function ItemCard({ item, onPress }: ItemCardProps): React.JSX.Element {
+export const ItemCard = React.memo(function ItemCard({
+  item,
+  onPress,
+}: ItemCardProps): React.JSX.Element {
   return (
     <Pressable
       style={({ pressed }) => [
@@ -29,6 +38,7 @@ export function ItemCard({ item, onPress }: ItemCardProps): React.JSX.Element {
       />
 
       <View style={styles.cardContent}>
+        {/* Header Badges */}
         <View style={styles.badgesRow}>
           <View style={styles.categoryBadge}>
             <Text style={styles.categoryBadgeText}>{item.category}</Text>
@@ -40,51 +50,55 @@ export function ItemCard({ item, onPress }: ItemCardProps): React.JSX.Element {
                 ? styles.statusInProduction
                 : item.status === 'Confirmado'
                 ? styles.statusConfirmed
-                : styles.statusPlanning,
+                : item.status === 'Planificación'
+                ? styles.statusPlanning
+                : styles.statusFinished,
             ]}
           >
             <Text style={styles.statusBadgeText}>{item.status}</Text>
           </View>
         </View>
 
-        <Text style={styles.titleText}>{item.name}</Text>
-        <Text style={styles.clientText}>Cliente: {item.client}</Text>
+        {/* Title & Client */}
+        <Text style={TYPOGRAPHY.cardTitle}>{item.name}</Text>
+        <Text style={TYPOGRAPHY.cardSubtitle}>Cliente: {item.client}</Text>
 
+        {/* Metadata section */}
         <View style={styles.metadataContainer}>
           <View style={styles.metaRow}>
             <Text style={styles.metaLabel}>📅 Fecha:</Text>
-            <Text style={styles.metaValue}>{item.date}</Text>
+            <Text style={TYPOGRAPHY.body}>{item.date}</Text>
           </View>
           <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>📍 LUGAR:</Text>
-            <Text style={styles.metaValue}>{item.location}</Text>
+            <Text style={styles.metaLabel}>📍 Lugar:</Text>
+            <Text style={[TYPOGRAPHY.body, styles.flexOne]} numberOfLines={1}>
+              {item.location}
+            </Text>
           </View>
         </View>
 
+        {/* Stats Row */}
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{item.capacity.toLocaleString()}</Text>
-            <Text style={styles.statLabel}>Aforo max</Text>
+            <Text style={TYPOGRAPHY.caption}>Aforo max</Text>
           </View>
-
           <View style={styles.statDivider} />
-
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{item.vendorsCount}</Text>
-            <Text style={styles.statLabel}>Proveedores</Text>
+            <Text style={TYPOGRAPHY.caption}>Proveedores</Text>
           </View>
-
           <View style={styles.statDivider} />
-
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{item.staffCount}</Text>
-            <Text style={styles.statLabel}>Personal</Text>
+            <Text style={TYPOGRAPHY.caption}>Personal</Text>
           </View>
         </View>
 
+        {/* Footer */}
         <View style={styles.footerRow}>
           <View>
-            <Text style={styles.budgetLabel}>Presupuesto</Text>
+            <Text style={TYPOGRAPHY.caption}>Presupuesto</Text>
             <Text style={styles.budgetValue}>{item.budget}</Text>
           </View>
           <View style={styles.actionButton}>
@@ -94,161 +108,139 @@ export function ItemCard({ item, onPress }: ItemCardProps): React.JSX.Element {
       </View>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: '#161b22',
-    borderRadius: 16,
-    marginBottom: 18,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    borderColor: COLORS.border,
     borderWidth: 1,
-    borderColor: '#30363d',
     overflow: 'hidden',
   },
   cardPressed: {
     opacity: 0.88,
-    borderColor: '#58a6ff',
+    borderColor: COLORS.primaryLight,
   },
   cardImage: {
     width: '100%',
-    height: 170,
+    height: 160,
   },
   cardContent: {
-    padding: 16,
+    padding: SPACING.lg,
   },
   badgesRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: SPACING.sm,
   },
   categoryBadge: {
-    backgroundColor: '#1f6feb22',
-    borderColor: '#1f6feb',
+    backgroundColor: COLORS.primaryBg,
+    borderColor: COLORS.primary,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
   },
   categoryBadgeText: {
-    color: '#58a6ff',
-    fontSize: 12,
+    color: COLORS.primaryLight,
+    fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',
   },
   statusBadge: {
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
     borderWidth: 1,
   },
   statusInProduction: {
-    backgroundColor: '#d2992222',
-    borderColor: '#d29922',
+    backgroundColor: COLORS.warningBg,
+    borderColor: COLORS.warning,
   },
   statusConfirmed: {
-    backgroundColor: '#23863622',
-    borderColor: '#238636',
+    backgroundColor: COLORS.successBg,
+    borderColor: COLORS.success,
   },
   statusPlanning: {
-    backgroundColor: '#8b949e22',
-    borderColor: '#8b949e',
+    backgroundColor: COLORS.surfaceLight,
+    borderColor: COLORS.borderLight,
+  },
+  statusFinished: {
+    backgroundColor: COLORS.dangerBg,
+    borderColor: COLORS.danger,
   },
   statusBadgeText: {
-    color: '#f0f6fc',
-    fontSize: 12,
+    color: COLORS.textPrimary,
+    fontSize: 11,
     fontWeight: '600',
   },
-  titleText: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  clientText: {
-    color: '#8b949e',
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 12,
-  },
   metadataContainer: {
-    backgroundColor: '#0d1117',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 12,
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    padding: SPACING.sm + 2,
+    marginVertical: SPACING.md,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   metaLabel: {
-    color: '#8b949e',
-    fontSize: 13,
-    width: 80,
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    width: 75,
     fontWeight: '600',
   },
-  metaValue: {
-    color: '#c9d1d9',
-    fontSize: 13,
-    fontWeight: '500',
+  flexOne: {
     flex: 1,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#21262d',
-    borderRadius: 10,
-    paddingVertical: 10,
-    marginBottom: 14,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACING.sm,
+    marginBottom: SPACING.md,
   },
   statBox: {
     alignItems: 'center',
     flex: 1,
   },
   statNumber: {
-    color: '#58a6ff',
-    fontSize: 15,
+    color: COLORS.primaryLight,
+    fontSize: 14,
     fontWeight: 'bold',
-  },
-  statLabel: {
-    color: '#8b949e',
-    fontSize: 11,
-    marginTop: 2,
   },
   statDivider: {
     width: 1,
-    height: 24,
-    backgroundColor: '#30363d',
+    height: 20,
+    backgroundColor: COLORS.border,
   },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 6,
+    paddingTop: SPACING.xs,
     borderTopWidth: 1,
-    borderTopColor: '#21262d',
-  },
-  budgetLabel: {
-    color: '#8b949e',
-    fontSize: 11,
-    textTransform: 'uppercase',
+    borderTopColor: COLORS.surfaceLight,
   },
   budgetValue: {
-    color: '#3fb950',
-    fontSize: 17,
+    color: COLORS.successLight,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   actionButton: {
-    backgroundColor: '#238636',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: COLORS.success,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs + 2,
   },
   actionButtonText: {
-    color: '#ffffff',
-    fontSize: 13,
+    color: COLORS.white,
+    fontSize: 12,
     fontWeight: '700',
   },
 });
