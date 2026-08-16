@@ -147,3 +147,7 @@ _exports/
 coverage/
 .jest-cache/
 maestro/.maestro/
+
+# Contexto local del proyecto
+CONTEXTO_BOOTCAMP.md
+
