@@ -1,6 +1,6 @@
 // ============================================================
 // MOCK DATA — src/data/mockData.ts
-// Dominio: Productora de Eventos
+// Dominio: Productora de Eventos (Moneda: Pesos Colombianos COP)
 // ============================================================
 
 import { EventItem } from '../types';
@@ -13,7 +13,7 @@ export const MOCK_EVENTS: EventItem[] = [
     category: 'Festival',
     date: '25 de Octubre, 2026',
     location: 'Centro de Eventos Valle del Pacífico, Cali',
-    budget: '$85,000 USD',
+    budget: '$ 340.000.000 COP',
     capacity: 18000,
     imageUri: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
     status: 'En Producción',
@@ -31,7 +31,7 @@ export const MOCK_EVENTS: EventItem[] = [
     category: 'Conferencia',
     date: '12 de Noviembre, 2026',
     location: 'Hotel Grand Hyatt, Bogotá',
-    budget: '$32,000 USD',
+    budget: '$ 128.000.000 COP',
     capacity: 1500,
     imageUri: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
     status: 'Confirmado',
@@ -49,7 +49,7 @@ export const MOCK_EVENTS: EventItem[] = [
     category: 'Boda',
     date: '05 de Diciembre, 2026',
     location: 'Hacienda San Rafael, Sopó',
-    budget: '$25,000 USD',
+    budget: '$ 98.000.000 COP',
     capacity: 350,
     imageUri: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
     status: 'Planificación',
@@ -67,7 +67,7 @@ export const MOCK_EVENTS: EventItem[] = [
     category: 'Corporativo',
     date: '18 de Enero, 2027',
     location: 'Corferias Pabellón 6, Bogotá',
-    budget: '$60,000 USD',
+    budget: '$ 240.000.000 COP',
     capacity: 8000,
     imageUri: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
     status: 'Confirmado',
@@ -85,7 +85,7 @@ export const MOCK_EVENTS: EventItem[] = [
     category: 'Concierto',
     date: '14 de Febrero, 2027',
     location: 'Movistar Arena, Bogotá',
-    budget: '$120,000 USD',
+    budget: '$ 480.000.000 COP',
     capacity: 14000,
     imageUri: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=800&q=80',
     status: 'En Producción',
@@ -103,7 +103,7 @@ export const MOCK_EVENTS: EventItem[] = [
     category: 'Corporativo',
     date: '28 de Febrero, 2027',
     location: 'Club El Nogal, Bogotá',
-    budget: '$45,000 USD',
+    budget: '$ 180.000.000 COP',
     capacity: 600,
     imageUri: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80',
     status: 'Planificación',
