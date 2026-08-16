@@ -151,3 +151,7 @@ maestro/.maestro/
 # Contexto local del proyecto
 CONTEXTO_BOOTCAMP.md
 
+# Carpetas de desarrollo local (soluciones locales)
+soluciones/
+
+
