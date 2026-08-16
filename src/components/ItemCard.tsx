@@ -38,7 +38,6 @@ export const ItemCard = React.memo(function ItemCard({
       />
 
       <View style={styles.cardContent}>
-        {/* Header Badges */}
         <View style={styles.badgesRow}>
           <View style={styles.categoryBadge}>
             <Text style={styles.categoryBadgeText}>{item.category}</Text>
@@ -50,20 +49,16 @@ export const ItemCard = React.memo(function ItemCard({
                 ? styles.statusInProduction
                 : item.status === 'Confirmado'
                 ? styles.statusConfirmed
-                : item.status === 'Planificación'
-                ? styles.statusPlanning
-                : styles.statusFinished,
+                : styles.statusPlanning,
             ]}
           >
             <Text style={styles.statusBadgeText}>{item.status}</Text>
           </View>
         </View>
 
-        {/* Title & Client */}
         <Text style={TYPOGRAPHY.cardTitle}>{item.name}</Text>
         <Text style={TYPOGRAPHY.cardSubtitle}>Cliente: {item.client}</Text>
 
-        {/* Metadata section */}
         <View style={styles.metadataContainer}>
           <View style={styles.metaRow}>
             <Text style={styles.metaLabel}>📅 Fecha:</Text>
@@ -77,32 +72,13 @@ export const ItemCard = React.memo(function ItemCard({
           </View>
         </View>
 
-        {/* Stats Row */}
-        <View style={styles.statsRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{item.capacity.toLocaleString()}</Text>
-            <Text style={TYPOGRAPHY.caption}>Aforo max</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{item.vendorsCount}</Text>
-            <Text style={TYPOGRAPHY.caption}>Proveedores</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{item.staffCount}</Text>
-            <Text style={TYPOGRAPHY.caption}>Personal</Text>
-          </View>
-        </View>
-
-        {/* Footer */}
         <View style={styles.footerRow}>
           <View>
             <Text style={TYPOGRAPHY.caption}>Presupuesto</Text>
             <Text style={styles.budgetValue}>{item.budget}</Text>
           </View>
           <View style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>Gestionar Evento →</Text>
+            <Text style={styles.actionButtonText}>Ver Ficha Completa →</Text>
           </View>
         </View>
       </View>
@@ -167,10 +143,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceLight,
     borderColor: COLORS.borderLight,
   },
-  statusFinished: {
-    backgroundColor: COLORS.dangerBg,
-    borderColor: COLORS.danger,
-  },
   statusBadgeText: {
     color: COLORS.textPrimary,
     fontSize: 11,
@@ -196,29 +168,6 @@ const styles = StyleSheet.create({
   flexOne: {
     flex: 1,
   },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: RADIUS.md,
-    paddingVertical: SPACING.sm,
-    marginBottom: SPACING.md,
-  },
-  statBox: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statNumber: {
-    color: COLORS.primaryLight,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  statDivider: {
-    width: 1,
-    height: 20,
-    backgroundColor: COLORS.border,
-  },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -233,7 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   actionButton: {
-    backgroundColor: COLORS.success,
+    backgroundColor: COLORS.primary,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs + 2,

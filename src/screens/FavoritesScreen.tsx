@@ -1,6 +1,6 @@
 // ============================================================
-// SCREEN: HomeScreen (HomeList)
-// Dominio: Productora de Eventos (Semana 03)
+// SCREEN: FavoritesScreen
+// Dominio: Productora de Eventos (Semana 03 - Pestaña 2)
 // ============================================================
 
 import React, { useCallback } from 'react';
@@ -16,15 +16,20 @@ import {
 import { EventItem } from '../types';
 import { MOCK_EVENTS } from '../data/mockData';
 import { ItemCard } from '../components/ItemCard';
-import { HomeListScreenProps } from '../navigation/types';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
+import { FavoritesScreenProps } from '../navigation/types';
+import { COLORS, SPACING, TYPOGRAPHY } from '../theme';
 
-export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Element {
+export function FavoritesScreen({ navigation }: FavoritesScreenProps): React.JSX.Element {
+  const favoriteEvents = MOCK_EVENTS.filter((evt) => evt.isFavorite);
+
   const handleEventPress = useCallback(
     (item: EventItem) => {
-      navigation.navigate('DetailScreen', {
-        id: item.id,
-        name: item.name,
+      navigation.navigate('HomeTab', {
+        screen: 'DetailScreen',
+        params: {
+          id: item.id,
+          name: item.name,
+        },
       });
     },
     [navigation]
@@ -49,15 +54,15 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
       <View style={styles.header}>
-        <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 03</Text>
-        <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
+        <Text style={styles.badge}>BC-REACTNATIVE • PESTAÑA FAVORITOS</Text>
+        <Text style={TYPOGRAPHY.headerTitle}>Eventos Destacados ⭐</Text>
         <Text style={TYPOGRAPHY.headerSubtitle}>
-          Catálogo General de Producciones & Eventos
+          Producciones prioritarias asignadas para seguimiento
         </Text>
       </View>
 
       <FlatList
-        data={MOCK_EVENTS}
+        data={favoriteEvents}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={renderSeparator}
@@ -82,7 +87,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   badge: {
-    color: COLORS.successLight,
+    color: COLORS.warningLight,
     fontSize: 11,
     fontWeight: 'bold',
     marginBottom: 2,

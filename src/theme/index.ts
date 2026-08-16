@@ -34,7 +34,7 @@ export const COLORS = {
 
 export const TYPOGRAPHY = {
   headerTitle: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold' as const,
     color: COLORS.textPrimary,
   },
@@ -58,10 +58,6 @@ export const TYPOGRAPHY = {
   caption: {
     fontSize: 11,
     color: COLORS.textSecondary,
-  },
-  badge: {
-    fontSize: 11,
-    fontWeight: '700' as const,
   },
 } as const;
 
