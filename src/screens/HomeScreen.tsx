@@ -1,9 +1,10 @@
 // ============================================================
-// SCREEN: HomeScreen (HomeList)
-// Dominio: Productora de Eventos (Semana 04 - Zustand)
+// SCREEN: HomeScreen (HomeList) — src/screens/HomeScreen.tsx
+// Dominio: Productora de Eventos (Pesos Colombianos COP)
+// Semana 05: Networking & TanStack Query v5 (useQuery + Pull-to-refresh)
 // ============================================================
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -11,17 +12,41 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
+  ActivityIndicator,
+  Pressable,
   ListRenderItemInfo,
 } from 'react-native';
-import { EventItem } from '../types';
-import { MOCK_EVENTS } from '../data/mockData';
+import { EventItem, EventCategory } from '../types';
 import { ItemCard } from '../components/ItemCard';
+import { useEvents } from '../hooks/useEvents';
 import { useEventStore } from '../stores/useEventStore';
 import { HomeListScreenProps } from '../navigation/types';
-import { COLORS, SPACING, TYPOGRAPHY } from '../theme';
+import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
+
+const CATEGORIES: EventCategory[] = [
+  'Todos',
+  'Concierto',
+  'Boda',
+  'Conferencia',
+  'Corporativo',
+  'Festival',
+];
 
 export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Element {
-  // Selector Zustand para obtener la cantidad de guardados en tiempo real
+  // Estado local para filtro por categoría
+  const [selectedCategory, setSelectedCategory] = useState<EventCategory>('Todos');
+
+  // TanStack Query v5: hook de consulta de red centralizado
+  const {
+    data: events,
+    isLoading,
+    isError,
+    isFetching,
+    refetch,
+    error,
+  } = useEvents();
+
+  // Selector Zustand para estado de UI del cliente (favoritos/guardados)
   const savedCount = useEventStore((state) => state.savedEvents.length);
 
   const handleEventPress = useCallback(
@@ -33,6 +58,10 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
     },
     [navigation]
   );
+
+  const handleCreatePress = useCallback(() => {
+    navigation.navigate('CreateScreen');
+  }, [navigation]);
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<EventItem>) => (
@@ -48,32 +77,140 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
     []
   );
 
+  // Filtrado reactivo en base a los datos obtenidos por useQuery
+  const filteredEvents = React.useMemo(() => {
+    if (!events) return [];
+    if (selectedCategory === 'Todos') return events;
+    return events.filter((e) => e.category === selectedCategory);
+  }, [events, selectedCategory]);
+
+  // ── ESTADO 1: CARGA INICIAL (Loading State) ────────────────
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={COLORS.primaryLight} />
+          <Text style={styles.loadingTitle}>Consultando API REST...</Text>
+          <Text style={styles.loadingSubtitle}>
+            Cargando producciones y eventos en Pesos Colombianos (COP)
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ── ESTADO 2: ERROR DE RED (Error State) ───────────────────
+  if (isError) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+        <View style={styles.centered}>
+          <View style={styles.errorIconCircle}>
+            <Text style={styles.errorIconText}>⚠️</Text>
+          </View>
+          <Text style={styles.errorTitle}>Error al sincronizar producciones</Text>
+          <Text style={styles.errorMessage}>
+            {error?.message || 'No fue posible conectar con el servidor de la API.'}
+          </Text>
+          <Pressable style={styles.retryButton} onPress={() => refetch()}>
+            <Text style={styles.retryButtonText}>🔄 Reintentar conexión</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ── ESTADO 3: ÉXITO (Renderizado de Lista con Pull-to-Refresh) ──
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
+      {/* Cabecera Principal */}
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
           <View style={styles.flexOne}>
-            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 04 (ZUSTAND)</Text>
+            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 05 (TANSTACK QUERY v5)</Text>
             <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
           </View>
           <View style={styles.savedChip}>
             <Text style={styles.savedChipText}>⭐ {savedCount} Guardados</Text>
           </View>
         </View>
-        <Text style={TYPOGRAPHY.headerSubtitle}>
-          Catálogo General de Producciones & Eventos
-        </Text>
+
+        <View style={styles.headerActionsRow}>
+          <Text style={TYPOGRAPHY.headerSubtitle}>
+            Catálogo sincronizado vía Axios REST & TanStack Query
+          </Text>
+          {/* Botón para abrir modal de creación */}
+          <Pressable style={styles.createButton} onPress={handleCreatePress}>
+            <Text style={styles.createButtonText}>+ Nuevo Evento</Text>
+          </Pressable>
+        </View>
+
+        {/* Barra de Filtros por Categoría */}
+        <View style={styles.filtersScroll}>
+          {CATEGORIES.map((cat) => {
+            const isSelected = selectedCategory === cat;
+            return (
+              <Pressable
+                key={cat}
+                style={[styles.filterChip, isSelected && styles.filterChipActive]}
+                onPress={() => setSelectedCategory(cat)}
+              >
+                <Text
+                  style={[
+                    styles.filterChipText,
+                    isSelected && styles.filterChipTextActive,
+                  ]}
+                >
+                  {cat}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* Indicador de items y estado de red en segundo plano */}
+        <View style={styles.metaStatusBar}>
+          <Text style={styles.metaStatusText}>
+            Mostrando {filteredEvents.length} de {events?.length ?? 0} producciones
+          </Text>
+          {isFetching && !isLoading && (
+            <View style={styles.syncIndicator}>
+              <ActivityIndicator size="small" color={COLORS.primaryLight} />
+              <Text style={styles.syncText}>Sincronizando...</Text>
+            </View>
+          )}
+        </View>
       </View>
 
+      {/* FlatList con Pull-to-Refresh y Empty State */}
       <FlatList
-        data={MOCK_EVENTS}
+        data={filteredEvents}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={renderSeparator}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        // Pull to refresh de TanStack Query
+        onRefresh={refetch}
+        refreshing={isFetching && !isLoading}
+        // Empty State cuando no hay producciones
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>🎪</Text>
+            <Text style={styles.emptyTitle}>No hay producciones disponibles</Text>
+            <Text style={styles.emptySubtitle}>
+              {selectedCategory === 'Todos'
+                ? 'No se encontraron eventos en el servidor.'
+                : `No hay eventos registrados en la categoría "${selectedCategory}".`}
+            </Text>
+            <Pressable style={styles.emptyAction} onPress={handleCreatePress}>
+              <Text style={styles.emptyActionText}>Crear Primer Evento</Text>
+            </Pressable>
+          </View>
+        }
       />
     </SafeAreaView>
   );
@@ -87,7 +224,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.md,
-    paddingBottom: SPACING.md,
+    paddingBottom: SPACING.sm,
     backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
@@ -98,14 +235,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 4,
   },
+  headerActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.sm,
+  },
+  createButton: {
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 5,
+    borderRadius: RADIUS.md,
+  },
+  createButtonText: {
+    color: COLORS.background,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   flexOne: {
     flex: 1,
   },
   badge: {
     color: COLORS.successLight,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     marginBottom: 2,
+    letterSpacing: 0.5,
   },
   savedChip: {
     backgroundColor: COLORS.warningBg,
@@ -120,11 +275,145 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  filtersScroll: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.xs,
+    marginTop: SPACING.xs,
+    marginBottom: SPACING.xs,
+  },
+  filterChip: {
+    backgroundColor: COLORS.surfaceLight,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: 3,
+  },
+  filterChipActive: {
+    backgroundColor: COLORS.primaryBg,
+    borderColor: COLORS.primaryLight,
+  },
+  filterChipText: {
+    color: COLORS.textSecondary,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  filterChipTextActive: {
+    color: COLORS.primaryLight,
+    fontWeight: 'bold',
+  },
+  metaStatusBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 6,
+    paddingTop: 4,
+  },
+  metaStatusText: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+  },
+  syncIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  syncText: {
+    color: COLORS.primaryLight,
+    fontSize: 11,
+  },
   separator: {
     height: SPACING.md,
   },
   listContent: {
     padding: SPACING.lg,
     paddingBottom: SPACING.xxl,
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.xl,
+    gap: SPACING.sm,
+  },
+  loadingTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginTop: SPACING.md,
+  },
+  loadingSubtitle: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  errorIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: COLORS.dangerBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.sm,
+  },
+  errorIconText: {
+    fontSize: 28,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.danger,
+    textAlign: 'center',
+  },
+  errorMessage: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.md,
+  },
+  retryButton: {
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.sm + 2,
+    borderRadius: RADIUS.md,
+  },
+  retryButtonText: {
+    color: COLORS.background,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.xxl,
+    gap: SPACING.sm,
+  },
+  emptyIcon: {
+    fontSize: 40,
+    marginBottom: SPACING.xs,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    paddingHorizontal: SPACING.lg,
+  },
+  emptyAction: {
+    marginTop: SPACING.sm,
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+  },
+  emptyActionText: {
+    color: COLORS.background,
+    fontSize: 13,
+    fontWeight: 'bold',
   },
 });
