@@ -1,6 +1,7 @@
 // ============================================================
-// SCREEN: DetailScreen
-// Dominio: Productora de Eventos (Semana 04 - Zustand)
+// SCREEN: DetailScreen — src/screens/DetailScreen.tsx
+// Dominio: Productora de Eventos (Pesos Colombianos COP)
+// Semana 05: TanStack Query v5 useEventById + Estado Cliente Zustand
 // ============================================================
 
 import React from 'react';
@@ -13,40 +14,70 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { DetailScreenProps } from '../navigation/types';
-import { MOCK_EVENTS } from '../data/mockData';
+import { useEventById } from '../hooks/useEvents';
 import { useEventStore } from '../stores/useEventStore';
-import { COLORS, SPACING, RADIUS } from '../theme';
+import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
 
 export function DetailScreen({ route, navigation }: DetailScreenProps): React.JSX.Element {
   const { id, name } = route.params;
 
-  // Buscar el evento por ID
-  const event = MOCK_EVENTS.find((evt) => evt.id === id) || {
-    id,
-    name: name || 'Evento No Encontrado',
-    client: 'Desconocido',
-    category: 'Corporativo' as const,
-    date: 'Sin fecha',
-    location: 'Sin ubicación',
-    budget: '$ 0 COP',
-    capacity: 0,
-    imageUri: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
-    status: 'Planificación' as const,
-    vendorsCount: 0,
-    staffCount: 0,
-    description: 'No hay descripción disponible para este evento.',
-    contactPerson: 'No asignado',
-    contactEmail: 'contacto@eventos.co',
-  };
+  // TanStack Query v5: Consulta del servidor por ID
+  const {
+    data: event,
+    isLoading,
+    isError,
+    refetch,
+    error,
+  } = useEventById(id);
 
-  // Selector y acción de Zustand
+  // Zustand Store: Estado global del cliente para guardar/destacar
   const isSaved = useEventStore((state) =>
-    state.savedEvents.some((evt) => evt.id === event.id)
+    event ? state.savedEvents.some((evt) => evt.id === event.id) : false
   );
   const toggleSaveEvent = useEventStore((state) => state.toggleSaveEvent);
 
+  // ── ESTADO 1: CARGANDO DETALLE (Loading State) ─────────────
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={COLORS.primaryLight} />
+          <Text style={styles.loadingText}>Cargando ficha técnica del evento...</Text>
+          <Text style={styles.loadingSubtext}>Consultando API REST con useQuery</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ── ESTADO 2: ERROR DE RED AL CARGAR DETALLE (Error State) ──
+  if (isError || !event) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+        <View style={styles.centered}>
+          <Text style={styles.errorIcon}>⚠️</Text>
+          <Text style={styles.errorTitle}>Error al cargar producción</Text>
+          <Text style={styles.errorSubtext}>
+            {error?.message || 'No fue posible obtener la información del servidor.'}
+          </Text>
+          <View style={styles.errorButtonsRow}>
+            <Pressable style={styles.retryButton} onPress={() => refetch()}>
+              <Text style={styles.retryButtonText}>🔄 Reintentar</Text>
+            </Pressable>
+            <Pressable style={styles.backOutlineButton} onPress={() => navigation.goBack()}>
+              <Text style={styles.backOutlineButtonText}>← Volver</Text>
+            </Pressable>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ── ESTADO 3: DETALLE COMPLETO DEL SERVIDOR ────────────────
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
@@ -58,6 +89,9 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
           <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
             <Text style={styles.backButtonText}>← Volver</Text>
           </Pressable>
+          <View style={styles.networkBadge}>
+            <Text style={styles.networkBadgeText}>API SYNCHRONIZED</Text>
+          </View>
         </View>
 
         {/* Ficha del evento */}
@@ -72,7 +106,7 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
               </View>
             </View>
 
-            {/* Botón principal de Zustand: Agregar / Quitar de Destacados */}
+            {/* Botón interactivo de Zustand: Guardar / Quitar de Destacados */}
             <Pressable
               style={[styles.saveButton, isSaved && styles.saveButtonActive]}
               onPress={() => toggleSaveEvent(event)}
@@ -83,7 +117,7 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
             </Pressable>
           </View>
 
-          <Text style={styles.title}>{event.name}</Text>
+          <Text style={styles.title}>{event.name || name}</Text>
           <Text style={styles.client}>Cliente: {event.client}</Text>
 
           <View style={styles.divider} />
@@ -95,20 +129,22 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
           {/* Grid de Metadatos */}
           <View style={styles.gridContainer}>
             <View style={styles.gridItem}>
-              <Text style={styles.gridLabel}>📅 FECHA</Text>
+              <Text style={styles.gridLabel}>📅 FECHA PROGRAMADA</Text>
               <Text style={styles.gridValue}>{event.date}</Text>
             </View>
             <View style={styles.gridItem}>
-              <Text style={styles.gridLabel}>📍 LOCACIÓN</Text>
+              <Text style={styles.gridLabel}>📍 LOCACIÓN / CIUDAD</Text>
               <Text style={styles.gridValue}>{event.location}</Text>
             </View>
             <View style={styles.gridItem}>
-              <Text style={styles.gridLabel}>💰 PRESUPUESTO (COP)</Text>
+              <Text style={styles.gridLabel}>💰 PRESUPUESTO OFICIAL (COP)</Text>
               <Text style={styles.budgetValue}>{event.budget}</Text>
             </View>
             <View style={styles.gridItem}>
-              <Text style={styles.gridLabel}>👥 AFORO MÁXIMO</Text>
-              <Text style={styles.gridValue}>{event.capacity.toLocaleString()} personas</Text>
+              <Text style={styles.gridLabel}>👥 AFORO MÁXIMO PROYECTADO</Text>
+              <Text style={styles.gridValue}>
+                {event.capacity ? event.capacity.toLocaleString('es-CO') : '500'} personas
+              </Text>
             </View>
           </View>
 
@@ -169,6 +205,21 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: 'bold',
     fontSize: 13,
+  },
+  networkBadge: {
+    position: 'absolute',
+    bottom: SPACING.sm,
+    right: SPACING.md,
+    backgroundColor: 'rgba(31, 111, 235, 0.85)',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+  },
+  networkBadgeText: {
+    color: COLORS.white,
+    fontSize: 9,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   body: {
     padding: SPACING.lg,
@@ -322,5 +373,62 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     marginTop: 4,
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.xl,
+    gap: SPACING.sm,
+  },
+  loadingText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginTop: SPACING.md,
+  },
+  loadingSubtext: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+  },
+  errorIcon: {
+    fontSize: 32,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.danger,
+  },
+  errorSubtext: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.md,
+  },
+  errorButtonsRow: {
+    flexDirection: 'row',
+    gap: SPACING.md,
+  },
+  retryButton: {
+    backgroundColor: COLORS.primaryLight,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+  },
+  retryButtonText: {
+    color: COLORS.background,
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  backOutlineButton: {
+    borderColor: COLORS.borderLight,
+    borderWidth: 1,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+  },
+  backOutlineButtonText: {
+    color: COLORS.textPrimary,
+    fontSize: 13,
   },
 });
