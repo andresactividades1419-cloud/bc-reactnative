@@ -13,6 +13,7 @@ export type HomeStackParamList = {
     id: string;
     name: string;
   };
+  CreateScreen: undefined;
 };
 
 export type RootTabParamList = {
@@ -27,6 +28,11 @@ export type HomeListScreenProps = CompositeScreenProps<
 
 export type DetailScreenProps = CompositeScreenProps<
   NativeStackScreenProps<HomeStackParamList, 'DetailScreen'>,
+  BottomTabScreenProps<RootTabParamList>
+>;
+
+export type CreateScreenProps = CompositeScreenProps<
+  NativeStackScreenProps<HomeStackParamList, 'CreateScreen'>,
   BottomTabScreenProps<RootTabParamList>
 >;
 

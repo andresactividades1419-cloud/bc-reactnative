@@ -25,3 +25,6 @@ export interface EventItem {
 }
 
 export type Item = EventItem;
+
+export type CreateEventPayload = Omit<EventItem, 'id'>;
+export type CreateItemPayload = CreateEventPayload;
