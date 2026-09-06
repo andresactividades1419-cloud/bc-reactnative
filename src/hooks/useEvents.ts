@@ -18,7 +18,7 @@ import type { EventItem, CreateEventPayload } from '../types';
 // QUERY KEYS & ASYNC STORAGE KEYS
 // ============================================================
 export const EVENTS_QUERY_KEY = ['events'] as const;
-export const EVENTS_CACHE_KEY = '@events_production_cache';
+export const EVENTS_CACHE_KEY = '@events_production_cache_v2';
 
 export interface EventsQueryResult {
   events: EventItem[];
