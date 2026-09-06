@@ -18,11 +18,13 @@ import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
 interface ItemCardProps {
   item: EventItem;
   onPress: (item: EventItem) => void;
+  compact?: boolean;
 }
 
 export const ItemCard = React.memo(function ItemCard({
   item,
   onPress,
+  compact = false,
 }: ItemCardProps): React.JSX.Element {
   // Selector Zustand para verificar si está en la lista de destacados
   const isSaved = useEventStore((state) =>
@@ -34,29 +36,32 @@ export const ItemCard = React.memo(function ItemCard({
     <Pressable
       style={({ pressed }) => [
         styles.cardContainer,
+        compact && styles.cardContainerCompact,
         pressed && styles.cardPressed,
       ]}
       onPress={() => onPress(item)}
     >
-      <View style={styles.imageWrapper}>
-        <Image
-          source={{ uri: item.imageUri }}
-          style={styles.cardImage}
-          resizeMode="cover"
-        />
-        {/* Botón rápido de Zustand sobre la imagen */}
-        <Pressable
-          style={[styles.bookmarkBadge, isSaved && styles.bookmarkBadgeActive]}
-          onPress={(e) => {
-            e.stopPropagation();
-            toggleSaveEvent(item);
-          }}
-        >
-          <Text style={styles.bookmarkBadgeText}>
-            {isSaved ? '⭐ Guardado' : '☆ Guardar'}
-          </Text>
-        </Pressable>
-      </View>
+      {!compact && (
+        <View style={styles.imageWrapper}>
+          <Image
+            source={{ uri: item.imageUri }}
+            style={styles.cardImage}
+            resizeMode="cover"
+          />
+          {/* Botón rápido de Zustand sobre la imagen */}
+          <Pressable
+            style={[styles.bookmarkBadge, isSaved && styles.bookmarkBadgeActive]}
+            onPress={(e) => {
+              e.stopPropagation();
+              toggleSaveEvent(item);
+            }}
+          >
+            <Text style={styles.bookmarkBadgeText}>
+              {isSaved ? '⭐ Guardado' : '☆ Guardar'}
+            </Text>
+          </Pressable>
+        </View>
+      )}
 
       <View style={styles.cardContent}>
         <View style={styles.badgesRow}>
@@ -114,6 +119,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     borderWidth: 1,
     overflow: 'hidden',
+  },
+  cardContainerCompact: {
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.md,
   },
   cardPressed: {
     opacity: 0.88,
