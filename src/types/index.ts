@@ -20,6 +20,9 @@ export interface EventItem {
   vendorsCount: number;
   staffCount: number;
   featured?: boolean;
+  description?: string;
+  contactPerson?: string;
+  contactEmail?: string;
 }
 
 export type Item = EventItem;
