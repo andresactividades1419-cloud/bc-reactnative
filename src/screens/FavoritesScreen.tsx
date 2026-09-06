@@ -54,7 +54,6 @@ export function FavoritesScreen({ navigation }: FavoritesScreenProps): React.JSX
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
       <View style={styles.header}>
-        <Text style={styles.badge}>BC-REACTNATIVE • PESTAÑA FAVORITOS</Text>
         <Text style={TYPOGRAPHY.headerTitle}>Eventos Destacados ⭐</Text>
         <Text style={TYPOGRAPHY.headerSubtitle}>
           Producciones prioritarias asignadas para seguimiento
