@@ -55,7 +55,6 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
           <View style={styles.flexOne}>
-            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 04 (ZUSTAND)</Text>
             <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
           </View>
           <View style={styles.savedChip}>
