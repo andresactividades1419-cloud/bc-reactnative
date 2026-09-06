@@ -31,7 +31,6 @@ export function HomeScreen(): React.JSX.Element {
 
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerBadge}>BC-REACTNATIVE • FICHA 3228970</Text>
           <Text style={styles.headerTitle}>{DOMAIN_TITLE}</Text>
           <Text style={styles.headerSubtitle}>{DOMAIN_SUBTITLE}</Text>
         </View>
