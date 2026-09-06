@@ -4,6 +4,7 @@
 // ============================================================
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   fetchEventsApi,
   fetchEventByIdApi,
@@ -14,18 +15,39 @@ import {
 import type { EventItem, CreateEventPayload } from '../types';
 
 // ============================================================
-// QUERY KEYS
+// QUERY KEYS & ASYNC STORAGE KEYS
 // ============================================================
 export const EVENTS_QUERY_KEY = ['events'] as const;
+export const EVENTS_CACHE_KEY = '@events_production_cache';
+
+export interface EventsQueryResult {
+  events: EventItem[];
+  source: 'network' | 'cache';
+}
 
 // ============================================================
-// useEvents — Obtener lista de producciones / eventos (GET)
+// useEvents — Lista con soporte de caché offline en AsyncStorage
 // ============================================================
 export function useEvents() {
-  return useQuery<EventItem[], Error>({
+  return useQuery<EventsQueryResult, Error>({
     queryKey: EVENTS_QUERY_KEY,
-    queryFn: fetchEventsApi,
-    staleTime: 1000 * 60 * 2, // 2 minutos de datos frescos
+    queryFn: async (): Promise<EventsQueryResult> => {
+      try {
+        const data = await fetchEventsApi();
+        // Guardar en caché offline AsyncStorage cuando la red es exitosa
+        await AsyncStorage.setItem(EVENTS_CACHE_KEY, JSON.stringify(data));
+        return { events: data, source: 'network' };
+      } catch (networkError) {
+        console.warn('[useEvents] Fallo de red, consultando caché AsyncStorage...', networkError);
+        const cachedString = await AsyncStorage.getItem(EVENTS_CACHE_KEY);
+        if (cachedString) {
+          const parsed = JSON.parse(cachedString) as EventItem[];
+          return { events: parsed, source: 'cache' };
+        }
+        throw new Error('Sin conexión a red y sin datos en caché disponibles');
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutos
   });
 }
 

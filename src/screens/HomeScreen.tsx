@@ -19,6 +19,7 @@ import {
 import { EventItem, EventCategory } from '../types';
 import { ItemCard } from '../components/ItemCard';
 import { useEvents } from '../hooks/useEvents';
+import { usePreferences } from '../hooks/usePreferences';
 import { useEventStore } from '../stores/useEventStore';
 import { HomeListScreenProps } from '../navigation/types';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../theme';
@@ -36,15 +37,21 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
   // Estado local para filtro por categoría
   const [selectedCategory, setSelectedCategory] = useState<EventCategory>('Todos');
 
-  // TanStack Query v5: hook de consulta de red centralizado
+  // Preferencias síncronas de MMKV (sortOrder, compactMode, itemsPerPage)
+  const { sortOrder, compactMode, itemsPerPage } = usePreferences();
+
+  // TanStack Query v5 + Caché AsyncStorage
   const {
-    data: events,
+    data,
     isLoading,
     isError,
     isFetching,
     refetch,
     error,
   } = useEvents();
+
+  const events = data?.events ?? [];
+  const isOffline = data?.source === 'cache';
 
   // Selector Zustand para estado de UI del cliente (favoritos/guardados)
   const savedCount = useEventStore((state) => state.savedEvents.length);
@@ -65,9 +72,9 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<EventItem>) => (
-      <ItemCard item={item} onPress={handleEventPress} />
+      <ItemCard item={item} onPress={handleEventPress} compact={compactMode} />
     ),
-    [handleEventPress]
+    [handleEventPress, compactMode]
   );
 
   const keyExtractor = useCallback((item: EventItem) => item.id, []);
@@ -77,12 +84,22 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
     []
   );
 
-  // Filtrado reactivo en base a los datos obtenidos por useQuery
+  // Filtrado, ordenamiento MMKV y paginación
   const filteredEvents = React.useMemo(() => {
-    if (!events) return [];
-    if (selectedCategory === 'Todos') return events;
-    return events.filter((e) => e.category === selectedCategory);
-  }, [events, selectedCategory]);
+    let list =
+      selectedCategory === 'Todos'
+        ? [...events]
+        : events.filter((e) => e.category === selectedCategory);
+
+    // Ordenamiento según preferencia MMKV
+    list.sort((a, b) => {
+      const cmp = a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
+      return sortOrder === 'desc' ? -cmp : cmp;
+    });
+
+    // Paginación según preferencia MMKV
+    return list.slice(0, itemsPerPage);
+  }, [events, selectedCategory, sortOrder, itemsPerPage]);
 
   // ── ESTADO 1: CARGA INICIAL (Loading State) ────────────────
   if (isLoading) {
@@ -128,9 +145,17 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
       {/* Cabecera Principal */}
       <View style={styles.header}>
+        {isOffline && (
+          <View style={styles.offlineBanner}>
+            <Text style={styles.offlineBannerText}>
+              ⚠️ Modo Sin Red: Mostrando producciones guardadas en caché (AsyncStorage)
+            </Text>
+          </View>
+        )}
+
         <View style={styles.headerTitleRow}>
           <View style={styles.flexOne}>
-            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 05 (TANSTACK QUERY v5)</Text>
+            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 07 (PERSISTENCIA LOCAL)</Text>
             <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
           </View>
           <View style={styles.savedChip}>
@@ -140,7 +165,7 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
         <View style={styles.headerActionsRow}>
           <Text style={TYPOGRAPHY.headerSubtitle}>
-            Catálogo sincronizado vía Axios REST & TanStack Query
+            Catálogo sincronizado vía MMKV, AsyncStorage & TanStack Query
           </Text>
           {/* Botón para abrir modal de creación */}
           <Pressable style={styles.createButton} onPress={handleCreatePress}>
@@ -415,5 +440,20 @@ const styles = StyleSheet.create({
     color: COLORS.background,
     fontSize: 13,
     fontWeight: 'bold',
+  },
+  offlineBanner: {
+    backgroundColor: COLORS.warningBg,
+    borderColor: COLORS.warning,
+    borderWidth: 1,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs + 2,
+    marginBottom: SPACING.sm,
+  },
+  offlineBannerText: {
+    color: COLORS.warningLight,
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

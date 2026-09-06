@@ -23,6 +23,7 @@ export type HomeStackParamList = {
 export type RootTabParamList = {
   HomeTab: NavigatorScreenParams<HomeStackParamList>;
   SavedTab: undefined;
+  SettingsTab: undefined;
 };
 
 export type HomeListScreenProps = CompositeScreenProps<
@@ -46,3 +47,5 @@ export type EditScreenProps = CompositeScreenProps<
 >;
 
 export type SavedScreenProps = BottomTabScreenProps<RootTabParamList, 'SavedTab'>;
+
+export type SettingsScreenProps = BottomTabScreenProps<RootTabParamList, 'SettingsTab'>;

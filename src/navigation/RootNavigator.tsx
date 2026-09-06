@@ -13,6 +13,7 @@ import { DetailScreen } from '../screens/DetailScreen';
 import { CreateScreen } from '../screens/CreateScreen';
 import { EditScreen } from '../screens/EditScreen';
 import { SavedScreen } from '../screens/FavoritesScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
 import { useEventStore } from '../stores/useEventStore';
 import { COLORS } from '../theme';
 
@@ -105,6 +106,16 @@ export function RootNavigator(): React.JSX.Element {
           },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="SettingsTab"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: 'Ajustes',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
           ),
         }}
       />
