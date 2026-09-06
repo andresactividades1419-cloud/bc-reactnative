@@ -72,7 +72,6 @@ export function SavedScreen({ navigation }: SavedScreenProps): React.JSX.Element
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
           <View style={styles.flexOne}>
-            <Text style={styles.badge}>BC-REACTNATIVE • ESTADO GLOBAL ZUSTAND</Text>
             <Text style={TYPOGRAPHY.headerTitle}>Eventos Destacados ⭐</Text>
           </View>
           {savedEvents.length > 0 && (
@@ -82,7 +81,7 @@ export function SavedScreen({ navigation }: SavedScreenProps): React.JSX.Element
           )}
         </View>
         <Text style={TYPOGRAPHY.headerSubtitle}>
-          {savedEvents.length} producciones marcadas en tu estado global
+          {savedEvents.length} {savedEvents.length === 1 ? 'producción guardada' : 'producciones guardadas'} en tu lista
         </Text>
       </View>
 
