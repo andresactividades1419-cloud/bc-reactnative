@@ -49,7 +49,6 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
 
       <View style={styles.header}>
-        <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 03</Text>
         <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
         <Text style={TYPOGRAPHY.headerSubtitle}>
           Catálogo General de Producciones & Eventos
