@@ -91,42 +91,43 @@ export async function fetchEventsApi(): Promise<EventItem[]> {
   const response = await apiClient.get<JsonPlaceholderPost[]>('/posts?_limit=12');
   const posts = response.data;
 
-  // Mapear los posts reales de la red a la estructura del dominio
+  // Mapear cada uno de los 12 posts a los 12 eventos únicos de MOCK_EVENTS
   const mappedEvents: EventItem[] = posts.map((post, index) => {
     const baseMock = MOCK_EVENTS[index % MOCK_EVENTS.length];
     return {
       ...baseMock,
       id: `evt-${post.id}`,
-      // Enriquecer con datos del post de red si corresponde
-      name: baseMock?.name ?? `Producción #${post.id}: ${post.title.slice(0, 24)}`,
       description: baseMock?.description ?? post.body,
     };
   });
 
-  // Retornar los creados vía POST primero + los del servidor
-  return [...createdEventsCache, ...mappedEvents];
+  // Combinar evitando cualquier duplicado de id o nombre
+  const combined: EventItem[] = [...createdEventsCache];
+  for (const item of mappedEvents) {
+    if (!combined.some((c) => c.id === item.id || c.name === item.name)) {
+      combined.push(item);
+    }
+  }
+
+  return combined;
 }
 
 /**
  * Obtiene un evento por ID desde la API usando Axios GET.
  */
 export async function fetchEventByIdApi(id: string): Promise<EventItem> {
-  // Verificar si fue un evento creado recientemente
+  // 1. Verificar si fue creado/modificado recientemente en la sesión
   const cached = createdEventsCache.find((e) => e.id === id);
   if (cached) return cached;
 
-  // Extraer el ID numérico para la API
-  const numericId = id.replace('evt-', '');
-  const response = await apiClient.get<JsonPlaceholderPost>(`/posts/${numericId || 1}`);
-  const post = response.data;
+  // 2. Buscar directamente en el catálogo de eventos únicos
+  const foundMock = MOCK_EVENTS.find((e) => e.id === id);
+  if (foundMock) return foundMock;
 
-  const foundMock = MOCK_EVENTS.find((e) => e.id === id) || MOCK_EVENTS[0];
-  return {
-    ...foundMock,
-    id,
-    name: foundMock.name,
-    description: foundMock.description || post.body,
-  };
+  // 3. Fallback por mapeo numérico de la API
+  const numericId = Number(id.replace('evt-', '')) || 1;
+  const index = (numericId - 1 + MOCK_EVENTS.length) % MOCK_EVENTS.length;
+  return MOCK_EVENTS[index] || MOCK_EVENTS[0];
 }
 
 /**
