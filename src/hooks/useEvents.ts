@@ -8,6 +8,7 @@ import {
   fetchEventsApi,
   fetchEventByIdApi,
   createEventApi,
+  updateEventApi,
   deleteEventApi,
 } from '../services/api';
 import type { EventItem, CreateEventPayload } from '../types';
@@ -54,6 +55,25 @@ export function useCreateEvent() {
     },
     onError: (error) => {
       console.error('[useCreateEvent Error]', error.message);
+    },
+  });
+}
+
+// ============================================================
+// useUpdateEvent — Actualizar producción existente (PUT)
+// ============================================================
+export function useUpdateEvent() {
+  const queryClient = useQueryClient();
+
+  return useMutation<EventItem, Error, { id: string; payload: Partial<EventItem> }>({
+    mutationFn: ({ id, payload }) => updateEventApi(id, payload),
+    onSuccess: (_, variables) => {
+      // Invalida la lista y el detalle específico del ítem editado
+      queryClient.invalidateQueries({ queryKey: EVENTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: [...EVENTS_QUERY_KEY, variables.id] });
+    },
+    onError: (error) => {
+      console.error('[useUpdateEvent Error]', error.message);
     },
   });
 }
