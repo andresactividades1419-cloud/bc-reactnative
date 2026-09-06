@@ -1,5 +1,5 @@
 {
-  "name": "semana-05-proyecto",
+  "name": "semana-06-proyecto",
   "version": "1.0.0",
   "main": "expo/AppEntry",
   "scripts": {
@@ -10,6 +10,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~5.0.5",
     "@expo/vector-icons": "^14.0.4",
+    "@hookform/resolvers": "^5.9.1",
     "@react-navigation/bottom-tabs": "^7.3.1",
     "@react-navigation/native": "^7.1.8",
     "@react-navigation/native-stack": "^7.3.1",
@@ -19,10 +20,12 @@
     "expo-status-bar": "57.0.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-hook-form": "^7.87.0",
     "react-native": "0.86.0",
     "react-native-safe-area-context": "^5.3.0",
     "react-native-screens": "^4.10.0",
     "react-native-web": "^0.20.0",
+    "zod": "^4.5.4",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

@@ -1,10 +1,10 @@
 // ============================================================
-// SCREEN: CreateScreen — src/screens/CreateScreen.tsx
+// SCREEN: EditScreen — src/screens/EditScreen.tsx
 // Dominio: Productora de Eventos (Pesos Colombianos COP)
-// React Hook Form + Zod Resolver + TanStack Query useCreateEvent
+// React Hook Form + Zod Resolver + TanStack Query useUpdateEvent
 // ============================================================
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -19,72 +19,118 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { CreateScreenProps } from '../navigation/types';
-import { useCreateEvent } from '../hooks/useEvents';
+import { EditScreenProps } from '../navigation/types';
+import { useEventById, useUpdateEvent } from '../hooks/useEvents';
 import { eventSchema, EventFormData, EventFormInput, EVENT_CATEGORIES } from '../schemas/eventSchema';
 import { FormField } from '../components/FormField';
 import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../theme';
 
-export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Element {
-  // 1. Hook de mutación para registrar el evento vía HTTP POST
-  const { mutate: createEvent, isPending: isCreating } = useCreateEvent();
+export function EditScreen({ route, navigation }: EditScreenProps): React.JSX.Element {
+  const { id } = route.params;
 
-  // 2. Inicializar React Hook Form conectado al schema de Zod
+  // 1. Cargar datos del evento existente desde TanStack Query
+  const { data: event, isLoading: isLoadingData, isError } = useEventById(id);
+
+  // 2. Hook de mutación para actualizar vía HTTP PUT
+  const { mutate: updateEvent, isPending: isUpdating } = useUpdateEvent();
+
+  // 3. Inicializar React Hook Form con validación de Zod
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    reset,
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<EventFormInput, any, EventFormData>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       name: '',
       client: '',
       category: 'Concierto',
-      date: '2026-11-20',
+      date: '',
       location: '',
-      budget: 85000000,
-      capacity: 2500,
+      budget: 0,
+      capacity: 0,
       description: '',
     },
   });
 
-  // 3. Envío del formulario validado
+  // 4. Patrón clave de la semana: reset() dentro de useEffect cuando los datos cargan
+  useEffect(() => {
+    if (event) {
+      // Extraer valor numérico del presupuesto COP
+      const rawBudget =
+        typeof event.budget === 'string'
+          ? Number(event.budget.replace(/[^0-9]/g, '')) || 0
+          : event.budget;
+
+      reset({
+        name: event.name,
+        client: event.client,
+        category: (EVENT_CATEGORIES.includes(event.category as (typeof EVENT_CATEGORIES)[number])
+          ? event.category
+          : 'Concierto') as EventFormData['category'],
+        date: event.date,
+        location: event.location,
+        budget: rawBudget,
+        capacity: event.capacity,
+        description: event.description || '',
+      });
+    }
+  }, [event, reset]);
+
+  // 5. Envío del formulario validado
   const onSubmit = (formData: EventFormData): void => {
     const formattedBudget = `$ ${Number(formData.budget).toLocaleString('es-CO')} COP`;
 
-    const payload = {
-      name: formData.name.trim(),
-      client: formData.client.trim(),
-      category: formData.category,
-      date: formData.date.trim(),
-      location: formData.location.trim(),
-      budget: formattedBudget,
-      capacity: formData.capacity,
-      imageUri:
-        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80',
-      status: 'Planificación' as const,
-      vendorsCount: 4,
-      staffCount: 12,
-      description:
-        formData.description?.trim() ||
-        'Producción y montaje técnico gestionado por Productora de Eventos.',
-      contactPerson: 'Coordinación Logística',
-      contactEmail: 'contacto@eventos.co',
-    };
-
-    createEvent(payload, {
-      onSuccess: () => {
-        Alert.alert('¡Producción Registrada!', 'El evento se ha creado exitosamente.', [
-          { text: 'Aceptar', onPress: () => navigation.goBack() },
-        ]);
+    updateEvent(
+      {
+        id,
+        payload: {
+          name: formData.name.trim(),
+          client: formData.client.trim(),
+          category: formData.category,
+          date: formData.date.trim(),
+          location: formData.location.trim(),
+          budget: formattedBudget,
+          capacity: formData.capacity,
+          description: formData.description?.trim() || '',
+        },
       },
-      onError: (err) => {
-        Alert.alert('Error al crear', `No se pudo registrar la producción: ${err.message}`);
-      },
-    });
+      {
+        onSuccess: () => {
+          Alert.alert('¡Éxito!', 'Producción actualizada correctamente.', [
+            { text: 'Aceptar', onPress: () => navigation.goBack() },
+          ]);
+        },
+        onError: (err) => {
+          Alert.alert('Error al actualizar', `No se pudo guardar los cambios: ${err.message}`);
+        },
+      }
+    );
   };
 
-  const isSaving = isSubmitting || isCreating;
+  const isSaving = isSubmitting || isUpdating;
+  const canSubmit = !isSaving && isDirty;
+
+  if (isLoadingData) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={COLORS.primaryLight} />
+        <Text style={styles.loadingText}>Cargando datos de la producción...</Text>
+      </View>
+    );
+  }
+
+  if (isError || !event) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>No se pudo cargar la información del evento.</Text>
+        <Pressable style={styles.cancelButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.cancelButtonText}>Volver</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -99,10 +145,10 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
       >
         {/* Cabecera */}
         <View style={styles.header}>
-          <Text style={styles.badge}>REACT HOOK FORM + ZOD • CREATE</Text>
-          <Text style={styles.title}>Nueva Producción de Evento</Text>
+          <Text style={styles.badge}>REACT HOOK FORM + ZOD • EDIT</Text>
+          <Text style={styles.title}>Editar Producción</Text>
           <Text style={styles.subtitle}>
-            Completa la ficha técnica y presupuestaria en Pesos Colombianos (COP).
+            Modifica los detalles técnicos y presupuestarios en Pesos Colombianos (COP).
           </Text>
         </View>
 
@@ -111,7 +157,7 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
           control={control}
           name="name"
           label="Nombre de la Producción *"
-          placeholder="Ej: Festival Neon Lights 2026"
+          placeholder="Ej: Concierto Rock Fest 2026"
           errorMessage={errors.name?.message}
           editable={!isSaving}
         />
@@ -121,7 +167,7 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
           control={control}
           name="client"
           label="Cliente / Empresa Contratante *"
-          placeholder="Ej: LiveNation Colombia"
+          placeholder="Ej: Sony Music Colombia"
           errorMessage={errors.client?.message}
           editable={!isSaving}
         />
@@ -167,7 +213,7 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
           control={control}
           name="budget"
           label="Presupuesto en COP (Pesos Colombianos) *"
-          placeholder="Ej: 85000000"
+          placeholder="Ej: 150000000"
           helperText="Ingresa el valor numérico en COP (mínimo $ 100.000 COP)"
           keyboardType="numeric"
           errorMessage={errors.budget?.message}
@@ -178,8 +224,8 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
         <FormField
           control={control}
           name="capacity"
-          label="Aforo Estimado *"
-          placeholder="Ej: 2500"
+          label="Aforo Máximo Estimado *"
+          placeholder="Ej: 8000"
           keyboardType="number-pad"
           errorMessage={errors.capacity?.message}
           editable={!isSaving}
@@ -189,7 +235,7 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
         <FormField
           control={control}
           name="date"
-          label="Fecha Tentativa *"
+          label="Fecha Programada *"
           placeholder="Ej: 2026-11-20"
           errorMessage={errors.date?.message}
           editable={!isSaving}
@@ -200,7 +246,7 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
           control={control}
           name="location"
           label="Locación / Recinto *"
-          placeholder="Ej: Centro de Eventos Valle del Pacífico"
+          placeholder="Ej: Movistar Arena Bogotá"
           errorMessage={errors.location?.message}
           editable={!isSaving}
         />
@@ -209,8 +255,8 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
         <FormField
           control={control}
           name="description"
-          label="Especificaciones Técnicas / Requerimientos"
-          placeholder="Sonido lineal, luces robóticas, pantallas LED..."
+          label="Ficha Técnica & Requerimientos"
+          placeholder="Especificaciones de tarima, pantallas LED, iluminación..."
           multiline
           numberOfLines={4}
           errorMessage={errors.description?.message}
@@ -220,17 +266,17 @@ export function CreateScreen({ navigation }: CreateScreenProps): React.JSX.Eleme
         {/* Botones de acción */}
         <View style={styles.actions}>
           <Pressable
-            style={[styles.submitButton, isSaving && styles.submitButtonDisabled]}
+            style={[styles.submitButton, !canSubmit && styles.submitButtonDisabled]}
             onPress={handleSubmit(onSubmit)}
-            disabled={isSaving}
+            disabled={!canSubmit}
           >
             {isSaving ? (
               <View style={styles.loadingRow}>
                 <ActivityIndicator size="small" color={COLORS.background} />
-                <Text style={styles.submitButtonText}>Registrando Producción...</Text>
+                <Text style={styles.submitButtonText}>Guardando Cambios...</Text>
               </View>
             ) : (
-              <Text style={styles.submitButtonText}>🚀 Crear Producción (POST)</Text>
+              <Text style={styles.submitButtonText}>💾 Guardar Cambios (PUT)</Text>
             )}
           </Pressable>
 
@@ -259,11 +305,23 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     paddingBottom: SPACING.xxl * 2,
   },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    padding: SPACING.lg,
+  },
+  loadingText: {
+    color: COLORS.textSecondary,
+    marginTop: SPACING.md,
+    fontSize: 14,
+  },
   header: {
     marginBottom: SPACING.lg,
   },
   badge: {
-    color: COLORS.primaryLight,
+    color: COLORS.warning,
     fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -318,6 +376,11 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
     marginTop: 4,
     fontWeight: '500',
+  },
+  errorText: {
+    color: COLORS.danger,
+    fontSize: 14,
+    textAlign: 'center',
   },
   actions: {
     marginTop: SPACING.md,

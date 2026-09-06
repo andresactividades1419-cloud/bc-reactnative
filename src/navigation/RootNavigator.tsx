@@ -11,6 +11,7 @@ import { RootTabParamList, HomeStackParamList } from './types';
 import { HomeScreen } from '../screens/HomeScreen';
 import { DetailScreen } from '../screens/DetailScreen';
 import { CreateScreen } from '../screens/CreateScreen';
+import { EditScreen } from '../screens/EditScreen';
 import { SavedScreen } from '../screens/FavoritesScreen';
 import { useEventStore } from '../stores/useEventStore';
 import { COLORS } from '../theme';
@@ -44,6 +45,14 @@ function HomeStackNavigator(): React.JSX.Element {
       <Stack.Screen
         name="CreateScreen"
         component={CreateScreen}
+        options={{
+          headerShown: false,
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="EditScreen"
+        component={EditScreen}
         options={{
           headerShown: false,
           presentation: 'modal',
