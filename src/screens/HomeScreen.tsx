@@ -105,7 +105,6 @@ export function HomeScreen(): React.JSX.Element {
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 02</Text>
             <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
             <Text style={TYPOGRAPHY.headerSubtitle}>
               Búsqueda y gestión de producciones en tiempo real
