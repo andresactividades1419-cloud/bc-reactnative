@@ -29,14 +29,14 @@ En esta semana se implementa una **arquitectura de almacenamiento local en 3 niv
 - Custom Hook reactivo `usePreferences()` que expone y persiste 3 preferencias del usuario:
   - **`sortOrder` (`'asc' | 'desc'`):** Controla el orden alfabético de las producciones en el catálogo (`useMMKVString`).
   - **`compactMode` (`boolean`):** Alterna entre tarjetas completas con fotografía y tarjetas resumidas con menor espaciado (`useMMKVBoolean`).
-  - **`itemsPerPage` (`number`):** Define el límite visible de producciones (`5`, `10` o `20`) en la pantalla principal (`useMMKVNumber`).
+  - **`itemsPerPage` (`number`):** Define el límite visible de producciones (`5`, `10` o `20`) en la pantalla principal (`useMMKVNumber`), con valor por defecto de 20 para ver todas y botón para expandir.
 - Los cambios se guardan de inmediato en memoria y disco sin botones de "Guardar" y sin recargar la app.
 
 ### 2. AsyncStorage — Caché Offline y Soporte Sin Conexión (`src/hooks/useEvents.ts`)
-- Al realizar una consulta exitosa con Axios a la API REST, los datos se almacenan automáticamente en la clave `@events_production_cache`.
+- Al realizar una consulta exitosa con Axios a la API REST, los datos se almacenan automáticamente en la clave `@events_production_cache_v2`.
 - Si la conexión falla o el dispositivo está offline, el hook rescata las producciones cacheadas y marca `source: 'cache'`.
 - **Banner Offline en `HomeScreen`:** Cuando la información proviene de la caché local, se despliega un banner destacado en la parte superior:  
-  `⚠️ Modo Sin Red: Mostrando producciones guardadas en caché (AsyncStorage)`.
+  `⚠️ Modo sin conexión: Mostrando producciones guardadas localmente`.
 
 ### 3. Expo SecureStore — Credenciales VIP Encriptadas (`src/screens/SettingsScreen.tsx`)
 - Almacenamiento seguro del **PIN de Autorización de Presupuestos VIP** (`producer_vip_auth_pin`).

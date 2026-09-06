@@ -84,8 +84,8 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
     []
   );
 
-  // Filtrado, ordenamiento MMKV y paginación
-  const filteredEvents = React.useMemo(() => {
+  // 1. Lista ordenada y filtrada completa
+  const sortedAndFilteredEvents = React.useMemo(() => {
     let list =
       selectedCategory === 'Todos'
         ? [...events]
@@ -97,9 +97,48 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
       return sortOrder === 'desc' ? -cmp : cmp;
     });
 
-    // Paginación según preferencia MMKV
-    return list.slice(0, itemsPerPage);
-  }, [events, selectedCategory, sortOrder, itemsPerPage]);
+    return list;
+  }, [events, selectedCategory, sortOrder]);
+
+  // Estado para expandir y ver todas las producciones si hay límite activo en MMKV
+  const [showAllOverride, setShowAllOverride] = React.useState(false);
+
+  // Lista visible respetando preferencia de MMKV o mostrando todas si se expande
+  const visibleEvents = React.useMemo(() => {
+    if (showAllOverride || itemsPerPage >= sortedAndFilteredEvents.length) {
+      return sortedAndFilteredEvents;
+    }
+    return sortedAndFilteredEvents.slice(0, itemsPerPage);
+  }, [sortedAndFilteredEvents, itemsPerPage, showAllOverride]);
+
+  const renderFooter = useCallback(() => {
+    if (visibleEvents.length < sortedAndFilteredEvents.length) {
+      const remaining = sortedAndFilteredEvents.length - visibleEvents.length;
+      return (
+        <Pressable
+          style={styles.loadMoreButton}
+          onPress={() => setShowAllOverride(true)}
+        >
+          <Text style={styles.loadMoreButtonText}>
+            Ver todas las producciones (+{remaining} restantes) 👇
+          </Text>
+        </Pressable>
+      );
+    }
+    if (showAllOverride && sortedAndFilteredEvents.length > itemsPerPage) {
+      return (
+        <Pressable
+          style={styles.loadMoreButton}
+          onPress={() => setShowAllOverride(false)}
+        >
+          <Text style={styles.loadMoreButtonText}>
+            Restablecer límite de vista ({itemsPerPage} eventos) 👆
+          </Text>
+        </Pressable>
+      );
+    }
+    return null;
+  }, [visibleEvents.length, sortedAndFilteredEvents.length, showAllOverride, itemsPerPage]);
 
   // ── ESTADO 1: CARGA INICIAL (Loading State) ────────────────
   if (isLoading) {
@@ -198,9 +237,23 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
         {/* Indicador de items y estado de red en segundo plano */}
         <View style={styles.metaStatusBar}>
-          <Text style={styles.metaStatusText}>
-            Mostrando {filteredEvents.length} de {events?.length ?? 0} producciones
-          </Text>
+          <Pressable
+            style={styles.metaStatusPressable}
+            onPress={() => {
+              if (visibleEvents.length < sortedAndFilteredEvents.length) {
+                setShowAllOverride(true);
+              } else if (showAllOverride && sortedAndFilteredEvents.length > itemsPerPage) {
+                setShowAllOverride(false);
+              }
+            }}
+          >
+            <Text style={styles.metaStatusText}>
+              Mostrando {visibleEvents.length} de {sortedAndFilteredEvents.length} producciones
+              {visibleEvents.length < sortedAndFilteredEvents.length && (
+                <Text style={styles.metaStatusAction}> • Toca para ver todas</Text>
+              )}
+            </Text>
+          </Pressable>
           {isFetching && !isLoading && (
             <View style={styles.syncIndicator}>
               <ActivityIndicator size="small" color={COLORS.primaryLight} />
@@ -212,10 +265,11 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
       {/* FlatList con Pull-to-Refresh y Empty State */}
       <FlatList
-        data={filteredEvents}
+        data={visibleEvents}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={renderSeparator}
+        ListFooterComponent={renderFooter}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         // Pull to refresh de TanStack Query
@@ -335,9 +389,34 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingTop: 4,
   },
+  metaStatusPressable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   metaStatusText: {
     color: COLORS.textMuted,
     fontSize: 11,
+  },
+  metaStatusAction: {
+    color: COLORS.primaryLight,
+    fontWeight: 'bold',
+  },
+  loadMoreButton: {
+    backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.lg,
+  },
+  loadMoreButtonText: {
+    color: COLORS.primaryLight,
+    fontSize: 13,
+    fontWeight: 'bold',
   },
   syncIndicator: {
     flexDirection: 'row',
