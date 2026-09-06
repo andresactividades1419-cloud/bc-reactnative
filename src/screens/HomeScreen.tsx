@@ -145,17 +145,17 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
       {/* Cabecera Principal */}
       <View style={styles.header}>
+        {/* Banner de modo sin conexión */}
         {isOffline && (
           <View style={styles.offlineBanner}>
             <Text style={styles.offlineBannerText}>
-              ⚠️ Modo Sin Red: Mostrando producciones guardadas en caché (AsyncStorage)
+              ⚠️ Modo sin conexión: Mostrando producciones guardadas localmente
             </Text>
           </View>
         )}
 
         <View style={styles.headerTitleRow}>
           <View style={styles.flexOne}>
-            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 07 (PERSISTENCIA LOCAL)</Text>
             <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
           </View>
           <View style={styles.savedChip}>
@@ -165,7 +165,7 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
         <View style={styles.headerActionsRow}>
           <Text style={TYPOGRAPHY.headerSubtitle}>
-            Catálogo sincronizado vía MMKV, AsyncStorage & TanStack Query
+            Gestión Integral de Producciones & Eventos
           </Text>
           {/* Botón para abrir modal de creación */}
           <Pressable style={styles.createButton} onPress={handleCreatePress}>
