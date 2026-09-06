@@ -106,15 +106,29 @@ export function DetailScreen({ route, navigation }: DetailScreenProps): React.JS
               </View>
             </View>
 
-            {/* Botón interactivo de Zustand: Guardar / Quitar de Destacados */}
-            <Pressable
-              style={[styles.saveButton, isSaved && styles.saveButtonActive]}
-              onPress={() => toggleSaveEvent(event)}
-            >
-              <Text style={styles.saveButtonText}>
-                {isSaved ? '⭐ Quitar de Destacados' : '☆ Guardar en Destacados'}
-              </Text>
-            </Pressable>
+            {/* Botones de acción: Guardar en Zustand + Editar con React Hook Form */}
+            <View style={styles.actionButtonsRow}>
+              <Pressable
+                style={[styles.saveButton, isSaved && styles.saveButtonActive]}
+                onPress={() => toggleSaveEvent(event)}
+              >
+                <Text style={styles.saveButtonText}>
+                  {isSaved ? '⭐ Destacado' : '☆ Destacar'}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.editButton}
+                onPress={() =>
+                  navigation.navigate('EditScreen', {
+                    id: event.id,
+                    name: event.name,
+                  })
+                }
+              >
+                <Text style={styles.editButtonText}>✏️ Editar</Text>
+              </Pressable>
+            </View>
           </View>
 
           <Text style={styles.title}>{event.name || name}</Text>
@@ -261,6 +275,11 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
   },
+  actionButtonsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs + 2,
+  },
   saveButton: {
     backgroundColor: COLORS.surfaceLight,
     borderColor: COLORS.borderLight,
@@ -275,6 +294,19 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: COLORS.textPrimary,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  editButton: {
+    backgroundColor: COLORS.primaryBg,
+    borderColor: COLORS.primaryLight,
+    borderWidth: 1,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: SPACING.xs,
+  },
+  editButtonText: {
+    color: COLORS.primaryLight,
     fontSize: 12,
     fontWeight: 'bold',
   },

@@ -153,6 +153,39 @@ export async function createEventApi(payload: CreateEventPayload): Promise<Event
 }
 
 /**
+ * Actualiza un evento existente enviando una petición HTTP PUT real con Axios.
+ */
+export async function updateEventApi(id: string, payload: Partial<EventItem>): Promise<EventItem> {
+  const numericId = id.replace('evt-', '');
+  await apiClient.put<JsonPlaceholderPost>(`/posts/${numericId || 1}`, {
+    id: Number(numericId) || 1,
+    title: payload.name,
+    body: payload.description,
+    userId: 1,
+  });
+
+  const existing =
+    createdEventsCache.find((e) => e.id === id) ||
+    MOCK_EVENTS.find((e) => e.id === id) ||
+    MOCK_EVENTS[0];
+
+  const updatedEvent: EventItem = {
+    ...existing,
+    ...payload,
+    id,
+  };
+
+  const alreadyCached = createdEventsCache.some((e) => e.id === id);
+  if (alreadyCached) {
+    createdEventsCache = createdEventsCache.map((e) => (e.id === id ? updatedEvent : e));
+  } else {
+    createdEventsCache = [updatedEvent, ...createdEventsCache];
+  }
+
+  return updatedEvent;
+}
+
+/**
  * Elimina un evento enviando una petición HTTP DELETE real con Axios.
  */
 export async function deleteEventApi(id: string): Promise<void> {
