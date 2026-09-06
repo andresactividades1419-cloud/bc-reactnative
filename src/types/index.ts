@@ -12,8 +12,8 @@ export interface EventItem {
   capacity: number;
   imageUri: string;
   status: EventStatus;
-  vendorsCount: number;
-  staffCount: number;
+  vendorsCount?: number;
+  staffCount?: number;
 }
 
 export type Item = EventItem;
