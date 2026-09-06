@@ -135,7 +135,7 @@ export function SettingsScreen(): React.JSX.Element {
 
       {/* Preferencia: Producciones por Página */}
       <View style={[styles.row, styles.rowColumn]}>
-        <Text style={styles.rowLabel}>Producciones Visibles por Página</Text>
+        <Text style={styles.rowLabel}>Límite de Producciones por Vista</Text>
         <View style={styles.segmented}>
           {([5, 10, 20] as const).map((count) => {
             const isActive = itemsPerPage === count;
@@ -146,7 +146,7 @@ export function SettingsScreen(): React.JSX.Element {
                 onPress={() => setItemsPerPage(count)}
               >
                 <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>
-                  {count} eventos
+                  {count === 20 ? 'Todas (20)' : `${count} eventos`}
                 </Text>
               </Pressable>
             );

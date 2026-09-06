@@ -9,7 +9,7 @@ import { storage } from '../storage/mmkv';
 export const PREF_KEYS = {
   SORT_ORDER: 'pref_sortOrder',
   COMPACT_MODE: 'pref_compactMode',
-  ITEMS_PER_PAGE: 'pref_itemsPerPage',
+  ITEMS_PER_PAGE: 'pref_itemsPerPage_v2',
 } as const;
 
 // ─── Tipo de ordenamiento ─────────────────────────────────────────────────────
@@ -21,10 +21,10 @@ export function usePreferences() {
   const [compactModeRaw, setCompactModeRaw] = useMMKVBoolean(PREF_KEYS.COMPACT_MODE, storage);
   const [itemsPerPageRaw, setItemsPerPageRaw] = useMMKVNumber(PREF_KEYS.ITEMS_PER_PAGE, storage);
 
-  // Valores normalizados con defaults
+  // Valores normalizados con defaults (por defecto 20 para mostrar todas las producciones)
   const sortOrder: SortOrder = sortOrderRaw === 'desc' ? 'desc' : 'asc';
   const compactMode: boolean = Boolean(compactModeRaw);
-  const itemsPerPage: number = itemsPerPageRaw ?? 10;
+  const itemsPerPage: number = itemsPerPageRaw ?? 20;
 
   const setSortOrder = (value: SortOrder) => {
     setSortOrderRaw(value);
