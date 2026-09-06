@@ -87,13 +87,12 @@ export function SettingsScreen(): React.JSX.Element {
       showsVerticalScrollIndicator={false}
     >
       {/* ──────────────────────────────────────────────────────────
-          SECCIÓN 1: MMKV — PREFERENCIAS REACTIVAS SÍNCRONAS
+          SECCIÓN 1: PREFERENCIAS DEL CATÁLOGO
       ────────────────────────────────────────────────────────── */}
       <View style={styles.header}>
-        <Text style={styles.badge}>MMKV • ALMACENAMIENTO SÍNCRONO VÍA JSI</Text>
-        <Text style={styles.title}>Preferencias de la App</Text>
+        <Text style={styles.title}>Preferencias de Visualización</Text>
         <Text style={styles.subtitle}>
-          Estos valores persisten en tiempo real en MMKV sin async/await y sin necesidad de pulsar "Guardar".
+          Personaliza la presentación y navegación de las producciones en el catálogo.
         </Text>
       </View>
 
@@ -132,9 +131,6 @@ export function SettingsScreen(): React.JSX.Element {
             );
           })}
         </View>
-        <Text style={styles.rowDesc}>
-          Valor activo en MMKV: <Text style={styles.mono}>{sortOrder}</Text>
-        </Text>
       </View>
 
       {/* Preferencia: Producciones por Página */}
@@ -156,37 +152,28 @@ export function SettingsScreen(): React.JSX.Element {
             );
           })}
         </View>
-        <Text style={styles.rowDesc}>
-          Límite activo en MMKV: <Text style={styles.mono}>{itemsPerPage}</Text>
-        </Text>
       </View>
 
       {/* ──────────────────────────────────────────────────────────
-          SECCIÓN 2: EXPO SECURESTORE — DATOS SENSIBLES ENCRIPTADOS
+          SECCIÓN 2: SEGURIDAD Y AUTORIZACIÓN VIP
       ────────────────────────────────────────────────────────── */}
       <View style={styles.separator} />
 
       <View style={styles.header}>
-        <Text style={[styles.badge, { color: COLORS.warningLight }]}>
-          EXPO SECURESTORE • CIFRADO HARDWARE
-        </Text>
         <Text style={styles.title}>Credenciales y Seguridad VIP</Text>
         <Text style={styles.subtitle}>
-          SecureStore cifra los datos con cifrado por hardware en iOS Keychain o Android Keystore.
+          Autorización cifrada para la gestión y aprobación de presupuestos en Pesos Colombianos (COP).
         </Text>
       </View>
 
       <View style={styles.secureCard}>
         <Text style={styles.secureCardTitle}>
-          PIN de Autorización de Presupuestos VIP (COP)
-        </Text>
-        <Text style={styles.rowDesc}>
-          Clave de almacenamiento seguro: <Text style={styles.mono}>{SENSITIVE_KEY}</Text>
+          PIN de Autorización de Presupuestos VIP
         </Text>
 
         {maskedValue && (
           <View style={styles.maskedContainer}>
-            <Text style={styles.maskedLabel}>Token recuperado (enmascarado):</Text>
+            <Text style={styles.maskedLabel}>PIN registrado (enmascarado):</Text>
             <Text style={styles.maskedValue}>{maskedValue}</Text>
           </View>
         )}
@@ -200,7 +187,7 @@ export function SettingsScreen(): React.JSX.Element {
             onPress={handleReadSensitive}
           >
             <Text style={[styles.btnSecureText, { color: COLORS.primaryLight }]}>
-              🔍 Leer PIN
+              🔍 Consultar PIN
             </Text>
           </Pressable>
           <Pressable
@@ -212,18 +199,6 @@ export function SettingsScreen(): React.JSX.Element {
             </Text>
           </Pressable>
         </View>
-      </View>
-
-      {/* ──────────────────────────────────────────────────────────
-          SECCIÓN 3: CAJA PEDAGÓGICA DE STORAGE LAYERS
-      ────────────────────────────────────────────────────────── */}
-      <View style={styles.infoBox}>
-        <Text style={styles.infoBoxTitle}>💡 Arquitectura de Almacenamiento Local:</Text>
-        <Text style={styles.infoBoxText}>
-          • <Text style={styles.bold}>MMKV:</Text> Preferencias y switches de UI (síncrono, acceso C++ directo vía JSI sin serialización JSON pesada).{'\n'}
-          • <Text style={styles.bold}>AsyncStorage:</Text> Caché de catálogo y respuestas de red (asíncrono, apto para estructuras JSON grandes).{'\n'}
-          • <Text style={styles.bold}>SecureStore:</Text> Tokens de autenticación, JWTs y PINs (encriptado por hardware en Keychain/Keystore).
-        </Text>
       </View>
     </ScrollView>
   );
