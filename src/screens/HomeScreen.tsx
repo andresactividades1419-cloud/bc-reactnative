@@ -130,7 +130,6 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
           <View style={styles.flexOne}>
-            <Text style={styles.badge}>BC-REACTNATIVE • SEMANA 05 (TANSTACK QUERY v5)</Text>
             <Text style={TYPOGRAPHY.headerTitle}>Productora de Eventos</Text>
           </View>
           <View style={styles.savedChip}>
@@ -140,7 +139,7 @@ export function HomeScreen({ navigation }: HomeListScreenProps): React.JSX.Eleme
 
         <View style={styles.headerActionsRow}>
           <Text style={TYPOGRAPHY.headerSubtitle}>
-            Catálogo sincronizado vía Axios REST & TanStack Query
+            Gestión Integral de Producciones & Eventos
           </Text>
           {/* Botón para abrir modal de creación */}
           <Pressable style={styles.createButton} onPress={handleCreatePress}>
