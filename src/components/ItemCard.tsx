@@ -85,27 +85,31 @@ export const ItemCard = React.memo(function ItemCard({
         <Text style={TYPOGRAPHY.cardTitle}>{item.name}</Text>
         <Text style={TYPOGRAPHY.cardSubtitle}>Cliente: {item.client}</Text>
 
-        <View style={styles.metadataContainer}>
-          <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>📅 Fecha:</Text>
-            <Text style={TYPOGRAPHY.body}>{item.date}</Text>
+        {!compact && (
+          <View style={styles.metadataContainer}>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>📅 Fecha:</Text>
+              <Text style={TYPOGRAPHY.body}>{item.date}</Text>
+            </View>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>📍 Lugar:</Text>
+              <Text style={[TYPOGRAPHY.body, styles.flexOne]} numberOfLines={1}>
+                {item.location}
+              </Text>
+            </View>
           </View>
-          <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>📍 Lugar:</Text>
-            <Text style={[TYPOGRAPHY.body, styles.flexOne]} numberOfLines={1}>
-              {item.location}
-            </Text>
-          </View>
-        </View>
+        )}
 
         <View style={styles.footerRow}>
           <View>
             <Text style={TYPOGRAPHY.caption}>Presupuesto (COP)</Text>
             <Text style={styles.budgetValue}>{item.budget}</Text>
           </View>
-          <View style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>Ver Ficha →</Text>
-          </View>
+          {!compact && (
+            <View style={styles.actionButton}>
+              <Text style={styles.actionButtonText}>Ver Ficha →</Text>
+            </View>
+          )}
         </View>
       </View>
     </Pressable>
