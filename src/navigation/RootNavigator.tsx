@@ -40,7 +40,6 @@ function HomeStackNavigator(): React.JSX.Element {
         component={DetailScreen}
         options={({ route }) => ({
           title: route.params.name,
-          headerShown: false,
         })}
       />
     </Stack.Navigator>

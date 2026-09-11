@@ -23,6 +23,7 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Montaje de festival de música electrónica y arte digital con más de 20 artistas internacionales. Incluye diseño de escenarios principales, pirotecnia y sistema de iluminación láser.',
     contactPerson: 'Carlos Mendoza (Director de Logística)',
     contactEmail: 'cmendoza@livenation.co',
+    isFavorite: true,
   },
   {
     id: 'evt-102',
@@ -91,6 +92,7 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Gran concierto de rock con bandas legendarias de América Latina. Pantallas LED gigantes curvos, sonido L-Acoustics K1 y logística de aforo masivo.',
     contactPerson: 'Felipe Jaramillo (Director de Producción)',
     contactEmail: 'faramillo@paramo.co',
+    isFavorite: true,
   },
   {
     id: 'evt-106',
@@ -125,6 +127,7 @@ export const MOCK_EVENTS: EventItem[] = [
     description: 'Magno festival cultural con competencias de acordeón, tarimas folclóricas, transmisión televisiva nacional y zona de experiencias gastronómicas caribeñas.',
     contactPerson: 'Hernán Baute (Coordinador General)',
     contactEmail: 'hbaute@festivallegendario.co',
+    isFavorite: true,
   },
   {
     id: 'evt-108',

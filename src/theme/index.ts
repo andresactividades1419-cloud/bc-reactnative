@@ -11,7 +11,7 @@ export const COLORS = {
   borderLight: '#484f58',
   
   primary: '#1f6feb',
-  primaryLight: '#58a6ff',
+  primaryLight: '#61DAFB',
   primaryBg: '#1f6feb22',
   
   success: '#238636',
