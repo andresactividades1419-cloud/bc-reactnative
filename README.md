@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 Descripción del Dominio & Arquitectura de Persistencia
+## Descripción del Dominio & Arquitectura de Persistencia
 
 **Productora de Eventos**: Aplicación móvil profesional para la planificación, costeo, gestión y visualización de producciones y espectáculos en vivo (conciertos, festivales, bodas campestres, conferencias tech y eventos corporativos).
 
@@ -22,7 +22,7 @@ En esta semana se implementa una **arquitectura de almacenamiento local en 3 niv
 
 ---
 
-## 🚀 Características Implementadas
+## Características Implementadas
 
 ### 1. MMKV — Preferencias Reactivas en Tiempo Real (`src/storage/mmkv.ts` & `src/hooks/usePreferences.ts`)
 - Instancia global con `createMMKV({ id: 'event-production-storage' })`.
@@ -36,21 +36,22 @@ En esta semana se implementa una **arquitectura de almacenamiento local en 3 niv
 - Al realizar una consulta exitosa con Axios a la API REST, los datos se almacenan automáticamente en la clave `@events_production_cache_v2`.
 - Si la conexión falla o el dispositivo está offline, el hook rescata las producciones cacheadas y marca `source: 'cache'`.
 - **Banner Offline en `HomeScreen`:** Cuando la información proviene de la caché local, se despliega un banner destacado en la parte superior:  
-  `⚠️ Modo sin conexión: Mostrando producciones guardadas localmente`.
+  `Modo sin conexión: Mostrando producciones guardadas localmente`.
 
 ### 3. Expo SecureStore — Credenciales VIP Encriptadas (`src/screens/SettingsScreen.tsx`)
 - Almacenamiento seguro del **PIN de Autorización de Presupuestos VIP** (`producer_vip_auth_pin`).
+- El PIN se captura en un `TextInput` en pantalla — **nunca queda hardcodeado en el código fuente**.
 - Métodos implementados:
-  - `SecureStore.setItemAsync`: Cifra y guarda el PIN en el llavero nativo del sistema.
+  - `SecureStore.setItemAsync`: Cifra y guarda el PIN escrito por el usuario en el llavero nativo del sistema.
   - `SecureStore.getItemAsync`: Lee la credencial almacenada.
   - `SecureStore.deleteItemAsync`: Elimina de forma segura la credencial del dispositivo.
 - **Seguridad y Enmascaramiento:** En cumplimiento estricto con las directrices de seguridad, el dato **nunca se muestra en texto plano**, presentándose en pantalla en formato enmascarado (`••••••••-8970`).
 
 ### 4. Nueva Pestaña de Navegación (`src/screens/SettingsScreen.tsx` & `RootNavigator.tsx`)
 - Incorporada la 3ª pestaña en el Tab Navigator:
-  - **Eventos 📅:** Catálogo con TanStack Query, soporte offline, modo compacto y ordenamiento por MMKV.
-  - **Destacados ⭐:** Administrado con Zustand y badge dinámico en tiempo real.
-  - **Ajustes ⚙️:** Panel de switches MMKV y consola de credenciales seguras con SecureStore.
+  - **Eventos:** Catálogo con TanStack Query, soporte offline, modo compacto y ordenamiento por MMKV.
+  - **Destacados:** Administrado con Zustand y badge dinámico en tiempo real.
+  - **Ajustes:** Panel de switches MMKV y consola de credenciales seguras con SecureStore.
 
 ### 5. TypeScript Estricto
 - Interfaces del modelo y tipos de almacenamiento 100% explícitos.
@@ -58,7 +59,7 @@ En esta semana se implementa una **arquitectura de almacenamiento local en 3 niv
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 ├── App.tsx                       # QueryClientProvider + RootNavigator
@@ -103,18 +104,25 @@ En esta semana se implementa una **arquitectura de almacenamiento local en 3 niv
 
 ---
 
-## 🚀 Cómo ejecutar
+## Cómo ejecutar
+
+> **Importante:** a partir de esta semana, `react-native-mmkv` v4 usa la arquitectura Nitro (módulos nativos vía JSI/C++). Esto **no funciona dentro de Expo Go** — se necesita un build de desarrollo nativo.
 
 ```bash
 # 1. Instalar dependencias
 pnpm install
 # (o npm install)
 
-# 2. Iniciar servidor Expo
-npx expo start
+# 2. Generar los proyectos nativos (una sola vez, o tras cambiar dependencias nativas)
+npx expo prebuild
 
-# 3. Presionar 'a' para Android, 'i' para iOS simulador o escanear con Expo Go
+# 3. Compilar y ejecutar el build de desarrollo en el simulador/emulador
+npx expo run:ios
+# o
+npx expo run:android
 ```
+
+Si solo necesitas trabajar en pantallas que no tocan MMKV, `npx expo start` sigue sirviendo para iterar más rápido, pero las preferencias de `usePreferences()` no funcionarán en Expo Go.
 
 Para comprobar que el código cumple con TypeScript estricto:
 ```bash
