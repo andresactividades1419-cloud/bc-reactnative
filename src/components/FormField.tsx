@@ -1,134 +1,55 @@
-// src/components/FormField.tsx
-// Componente genérico y reutilizable que encapsula Controller + TextInput nativo + Error inline.
-// Tipado estrictamente con generics de React Hook Form sin uso de 'any'.
-
 import React from 'react';
 import {
-  StyleSheet,
+  View,
   Text,
   TextInput,
-  TextInputProps,
-  View,
+  StyleSheet,
+  type TextInputProps,
 } from 'react-native';
-import {
-  Controller,
-  type Control,
-  type FieldPath,
-  type FieldValues,
-} from 'react-hook-form';
+import { theme } from '../theme';
 
-import { COLORS, RADIUS, SPACING } from '../theme';
-
-// ──────────────────────────────────────────────────────────
-// PROPS DEL COMPONENTE CON GENERICS ESTRICTOS
-// ──────────────────────────────────────────────────────────
-
-export interface FormFieldProps<T extends FieldValues> extends TextInputProps {
-  control: Control<T, any, any>;
-  name: FieldPath<T>;
+interface FormFieldProps extends TextInputProps {
   label: string;
-  errorMessage?: string;
-  helperText?: string;
+  error?: string;
 }
 
-// ──────────────────────────────────────────────────────────
-// COMPONENTE FORM FIELD
-// ──────────────────────────────────────────────────────────
-
-export function FormField<T extends FieldValues>({
-  control,
-  name,
-  label,
-  errorMessage,
-  helperText,
-  style,
-  ...textInputProps
-}: FormFieldProps<T>): React.JSX.Element {
-  const hasError = Boolean(errorMessage);
-
+export function FormField({ label, error, ...inputProps }: FormFieldProps): React.JSX.Element {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-
-      <Controller
-        control={control}
-        name={name}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            style={[
-              styles.input,
-              textInputProps.multiline && styles.inputMultiline,
-              hasError && styles.inputError,
-              style,
-            ]}
-            value={value !== undefined && value !== null ? String(value) : ''}
-            onChangeText={onChange}
-            onBlur={onBlur}
-            placeholderTextColor={COLORS.textMuted}
-            selectionColor={COLORS.primaryLight}
-            {...textInputProps}
-          />
-        )}
+      <TextInput
+        style={[styles.input, error ? styles.inputError : null]}
+        placeholderTextColor={theme.colors.textMuted}
+        {...inputProps}
       />
-
-      {/* Mensaje de error inline o texto de ayuda */}
-      {hasError ? (
-        <Text style={styles.errorText} numberOfLines={2}>
-          ⚠️ {errorMessage}
-        </Text>
-      ) : helperText ? (
-        <Text style={styles.helperText} numberOfLines={1}>
-          {helperText}
-        </Text>
-      ) : null}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
   );
 }
 
-// ──────────────────────────────────────────────────────────
-// ESTILOS
-// ──────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   container: {
-    marginBottom: SPACING.md,
+    gap: 6,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    marginBottom: SPACING.xs,
+    fontSize: theme.fontSize.sm,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
   },
   input: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: RADIUS.md,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm + 2,
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  inputMultiline: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-    paddingTop: SPACING.sm + 4,
+    borderColor: theme.colors.border,
+    padding: 12,
+    color: theme.colors.text,
+    fontSize: theme.fontSize.md,
   },
   inputError: {
-    borderColor: COLORS.danger,
-    backgroundColor: COLORS.dangerBg,
+    borderColor: theme.colors.danger,
   },
   errorText: {
-    fontSize: 11,
-    color: COLORS.danger,
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  helperText: {
-    fontSize: 11,
-    color: COLORS.textMuted,
-    marginTop: 4,
+    fontSize: theme.fontSize.xs,
+    color: theme.colors.danger,
   },
 });
