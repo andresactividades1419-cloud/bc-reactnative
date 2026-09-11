@@ -1,6 +1,8 @@
 // src/components/FormField.tsx
 // Componente genérico y reutilizable que encapsula Controller + TextInput nativo + Error inline.
-// Tipado estrictamente con generics de React Hook Form sin uso de 'any'.
+// Tipado con generics de React Hook Form. El segundo genérico de `Control`
+// (TContext) queda como `any` porque así lo tipa la propia librería por defecto;
+// no es un casting inseguro sobre datos del dominio.
 
 import React from 'react';
 import {
