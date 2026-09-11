@@ -13,6 +13,7 @@ import {
   StyleSheet,
   Switch,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
@@ -22,7 +23,6 @@ import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../theme';
 
 // Clave segura para el dato sensible del dominio (PIN de autorización de presupuestos VIP)
 const SENSITIVE_KEY = 'producer_vip_auth_pin';
-const DEMO_SENSITIVE_PIN = 'VIP-COP-3228970';
 
 export function SettingsScreen(): React.JSX.Element {
   // 1. Preferencias reactivas y síncronas con MMKV
@@ -37,15 +37,22 @@ export function SettingsScreen(): React.JSX.Element {
 
   // Estado para el valor enmascarado leído de SecureStore
   const [maskedValue, setMaskedValue] = useState<string | null>(null);
+  // Valor que el productor escribe antes de guardarlo — nunca se hardcodea en el código
+  const [pinInput, setPinInput] = useState<string>('');
 
   // 2. Operaciones con Expo SecureStore
   const handleSaveSensitive = async (): Promise<void> => {
+    if (!pinInput.trim()) {
+      Alert.alert('Aviso', 'Escribe un PIN antes de guardarlo.');
+      return;
+    }
     try {
-      await SecureStore.setItemAsync(SENSITIVE_KEY, DEMO_SENSITIVE_PIN);
+      await SecureStore.setItemAsync(SENSITIVE_KEY, pinInput.trim());
       Alert.alert(
-        '🔐 Guardado Seguro',
+        'Guardado Seguro',
         'PIN de Autorización VIP guardado exitosamente en el llavero seguro nativo (Keychain / Keystore).'
       );
+      setPinInput('');
       setMaskedValue(null);
     } catch (error) {
       Alert.alert('Error', 'No se pudo guardar en SecureStore: ' + String(error));
@@ -54,7 +61,7 @@ export function SettingsScreen(): React.JSX.Element {
 
   const handleReadSensitive = async (): Promise<void> => {
     try {
-      const raw = await SecureStore.getItemAsync(SENSITIVE_KEY);
+      const raw: string | null = await SecureStore.getItemAsync(SENSITIVE_KEY);
       if (!raw) {
         Alert.alert('Aviso', 'No hay ningún PIN VIP guardado en SecureStore.');
         setMaskedValue(null);
@@ -74,7 +81,7 @@ export function SettingsScreen(): React.JSX.Element {
     try {
       await SecureStore.deleteItemAsync(SENSITIVE_KEY);
       setMaskedValue(null);
-      Alert.alert('🗑️ Eliminado', 'PIN de Autorización VIP eliminado de SecureStore.');
+      Alert.alert('Eliminado', 'PIN de Autorización VIP eliminado de SecureStore.');
     } catch (error) {
       Alert.alert('Error', 'No se pudo eliminar de SecureStore: ' + String(error));
     }
@@ -171,6 +178,15 @@ export function SettingsScreen(): React.JSX.Element {
           PIN de Autorización de Presupuestos VIP
         </Text>
 
+        <TextInput
+          style={styles.pinInput}
+          value={pinInput}
+          onChangeText={setPinInput}
+          placeholder="Escribe el nuevo PIN VIP"
+          placeholderTextColor={COLORS.textMuted}
+          secureTextEntry
+        />
+
         {maskedValue && (
           <View style={styles.maskedContainer}>
             <Text style={styles.maskedLabel}>PIN registrado (enmascarado):</Text>
@@ -180,14 +196,14 @@ export function SettingsScreen(): React.JSX.Element {
 
         <View style={styles.secureActions}>
           <Pressable style={styles.btnSecure} onPress={handleSaveSensitive}>
-            <Text style={styles.btnSecureText}>💾 Guardar PIN</Text>
+            <Text style={styles.btnSecureText}>Guardar PIN</Text>
           </Pressable>
           <Pressable
             style={[styles.btnSecure, styles.btnSecureAlt]}
             onPress={handleReadSensitive}
           >
             <Text style={[styles.btnSecureText, { color: COLORS.primaryLight }]}>
-              🔍 Consultar PIN
+              Consultar PIN
             </Text>
           </Pressable>
           <Pressable
@@ -195,7 +211,7 @@ export function SettingsScreen(): React.JSX.Element {
             onPress={handleDeleteSensitive}
           >
             <Text style={[styles.btnSecureText, { color: COLORS.danger }]}>
-              🗑️ Eliminar
+              Eliminar
             </Text>
           </Pressable>
         </View>
@@ -310,6 +326,16 @@ const styles = StyleSheet.create({
   secureCardTitle: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: COLORS.textPrimary,
+  },
+  pinInput: {
+    backgroundColor: COLORS.surfaceLight,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm + 2,
+    fontSize: 14,
     color: COLORS.textPrimary,
   },
   maskedContainer: {
