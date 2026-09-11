@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 Dominio Asignado
+## Dominio Asignado
 
 **Productora de Eventos**: Aplicación móvil para la visualización y gestión inicial de tarjetas de producciones y eventos en vivo (conciertos masivos, bodas campestres, conferencias tech y festivales).
 
@@ -24,7 +24,7 @@
 
 ---
 
-## 🚀 Características y Requisitos Implementados
+## Características y Requisitos Implementados
 
 1. **Uso de Core Components Nativos:**
    - Estructuración exclusiva con `View`, `Text`, `Image`, `ScrollView` y `Pressable`.
@@ -48,7 +48,7 @@
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 ├── App.tsx                     # Entry point de la aplicación
@@ -69,7 +69,7 @@
 
 ---
 
-## 🚀 Cómo ejecutar
+## Cómo ejecutar
 
 ```bash
 # 1. Instalar dependencias
