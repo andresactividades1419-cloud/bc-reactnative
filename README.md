@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 Descripción del Dominio
+## Descripción del Dominio
 
 **Productora de Eventos**: Sistema móvil para la exploración, búsqueda en tiempo real y filtrado por categorías de eventos masivos, corporativos, bodas, conferencias y festivales.
 
@@ -17,7 +17,7 @@
 - `category`: Categoría (`Concierto`, `Boda`, `Conferencia`, `Corporativo`, `Festival`)
 - `date`: Fecha programada
 - `location`: Locación o recinto
-- `budget`: Presupuesto asignado (ej. *$85,000 USD*)
+- `budget`: Presupuesto asignado en Pesos Colombianos (ej. *$ 340.000.000 COP*)
 - `capacity`: Aforo máximo de asistentes
 - `vendorsCount`: Número de proveedores contratados
 - `staffCount`: Personal técnico y de logística asignado
@@ -25,7 +25,7 @@
 
 ---
 
-## 🚀 Características Implementadas
+## Características Implementadas
 
 1. **`FlatList` Virtualizada con `keyExtractor` por ID:** Renderiza 12 eventos de forma fluida.
 2. **Búsqueda en Tiempo Real (`TextInput`):** Filtra simultáneamente por nombre de evento, cliente o locación.
@@ -43,7 +43,7 @@
 
 ---
 
-## 🎨 Decisiones de Diseño
+## Decisiones de Diseño
 
 - **Paleta de Colores Dark Mode:** Inspirada en GitHub Dark (Fondo `#0d1117`, Superficies `#161b22`, Bordes `#30363d`, Acentos en azul `#58a6ff` y verde `#238636`).
 - **Arquitectura de Componentes:** Componentes pequeños y modulares (`SearchBar`, `CategoryFilter`, `ItemCard`, `HomeScreen`).
