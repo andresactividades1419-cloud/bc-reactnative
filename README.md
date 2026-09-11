@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 Descripción del Dominio & Estado Global
+## Descripción del Dominio & Estado Global
 
 **Productora de Eventos**: Sistema móvil con gestión de estado global centralizado usando **Zustand**:
 - **Store Centralizado (`src/stores/useEventStore.ts`):** Administra la lista de eventos guardados/destacados (`savedEvents`) a lo largo de toda la aplicación sin prop drilling.
@@ -18,7 +18,7 @@
 
 ---
 
-## 🚀 Características Implementadas
+## Características Implementadas
 
 1. **Zustand Store (`useEventStore.ts`):**
    - Tipado 100% estricto en TypeScript sin uso de `any`.
@@ -27,14 +27,14 @@
    - La pestaña **Destacados** reacciona automáticamente al conteo del store Zustand (`savedCount`) mostrando un badge sin necesidad de estados globales pesados o Context API.
 3. **Pestaña Destacados (`SavedScreen` / `FavoritesScreen`):**
    - Muestra la lista de producciones marcadas desde cualquier pantalla.
-   - Botón **"Limpiar Todo 🗑️"** que ejecuta la acción `clearSavedEvents()` del store.
+   - Botón **"Limpiar Todo"** que ejecuta la acción `clearSavedEvents()` del store.
    - Estado vacío interactivo cuando no hay elementos.
 4. **Ficha Técnica (`DetailScreen.tsx`):**
    - Botón toggle dinámico que lee y modifica el store Zustand.
 
 ---
 
-## 🎨 Decisiones de Diseño
+## Decisiones de Diseño
 
 - **Arquitectura Limpia:** Separación entre pantallas (`src/screens/`), stores (`src/stores/`), componentes visuales (`src/components/`) y tipos (`src/types/`).
 - **Aesthetic Dark Theme:** Colores adaptados con jerarquía visual, bordes sutiles y contraste de acentos en amarillo para elementos destacados.
