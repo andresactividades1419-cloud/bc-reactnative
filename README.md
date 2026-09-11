@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 Descripción del Dominio & Arquitectura de Networking
+## Descripción del Dominio & Arquitectura de Networking
 
 **Productora de Eventos**: Sistema móvil profesional para la gestión, exploración y registro de producciones y eventos en vivo (conciertos, festivales, bodas, conferencias, eventos corporativos).
 
@@ -17,7 +17,7 @@ En esta semana se implementa la capa completa de **Networking** consumiendo APIs
 
 ---
 
-## 🚀 Características Implementadas
+## Características Implementadas
 
 ### 1. Cliente HTTP con Axios (`src/services/api.ts`)
 - Instancia centralizada de Axios con `baseURL`, cabeceras JSON por defecto y timeouts controlados.
@@ -50,7 +50,7 @@ En esta semana se implementa la capa completa de **Networking** consumiendo APIs
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 ├── App.tsx                       # Entry point con QueryClientProvider y RootNavigator
@@ -87,7 +87,7 @@ En esta semana se implementa la capa completa de **Networking** consumiendo APIs
 
 ---
 
-## 🚀 Cómo ejecutar
+## Cómo ejecutar
 
 ```bash
 # 1. Instalar dependencias
