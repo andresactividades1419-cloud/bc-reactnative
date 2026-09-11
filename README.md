@@ -6,7 +6,7 @@
 
 ---
 
-## 🎯 Descripción del Dominio & Arquitectura de Formularios
+## Descripción del Dominio & Arquitectura de Formularios
 
 **Productora de Eventos**: Sistema móvil profesional para la gestión, planeación, cotización y edición de producciones en vivo (conciertos masivos, festivales, bodas campestres, conferencias tech y eventos corporativos).
 
@@ -21,7 +21,7 @@ En esta semana se integra la capa completa de **captura y edición reactiva de d
 
 ---
 
-## 📋 Esquema Zod y Reglas de Validación (`src/schemas/eventSchema.ts`)
+## Esquema Zod y Reglas de Validación (`src/schemas/eventSchema.ts`)
 
 | Campo | Tipo Zod | Reglas de Validación |
 | :--- | :--- | :--- |
@@ -42,7 +42,7 @@ export type EventFormInput = z.input<typeof eventSchema>;
 
 ---
 
-## 🚀 Características Implementadas
+## Características Implementadas
 
 ### 1. Componente Reutilizable `FormField` (`src/components/FormField.tsx`)
 - Tipado genérico `<T extends FieldValues>` para integrarse con cualquier formulario de React Hook Form sin `any`.
@@ -80,16 +80,17 @@ export type EventFormInput = z.input<typeof eventSchema>;
 - Mutación de actualización con `useUpdateEvent` enviando petición HTTP PUT con Axios, invalidando tanto la lista general `['events']` como el detalle específico `['events', id]`.
 
 ### 4. Acceso desde la Ficha Técnica (`src/screens/DetailScreen.tsx`)
-- Incorporado botón interactivo **"✏️ Editar"** junto al botón de destacados en la barra de acciones superior.
+- Incorporado botón interactivo **"Editar"** junto al botón de destacados en la barra de acciones superior.
 - Navega fluidamente a `EditScreen` transmitiendo el ID y nombre del evento.
 
 ### 5. TypeScript Estricto
-- Cero uso de `any` ni `as any`.
+- Cero castings inseguros (`as any`) sobre datos del dominio.
+- El único uso de `any` es el genérico `TContext` de `useForm`/`Control` (`FormField.tsx`, `CreateScreen.tsx`, `EditScreen.tsx`), que la propia librería React Hook Form tipa así por defecto — no oculta ningún dato del dominio sin tipar.
 - Compilación validada al 100% con `npx tsc --noEmit`.
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 ├── App.tsx                       # Entry point con QueryClientProvider y RootNavigator
@@ -130,7 +131,7 @@ export type EventFormInput = z.input<typeof eventSchema>;
 
 ---
 
-## 🚀 Cómo ejecutar
+## Cómo ejecutar
 
 ```bash
 # 1. Instalar dependencias
