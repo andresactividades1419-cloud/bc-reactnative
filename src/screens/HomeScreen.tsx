@@ -1,167 +1,246 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
+  Animated,
   FlatList,
+  LayoutAnimation,
+  Platform,
+  SafeAreaView,
   StyleSheet,
-  ActivityIndicator,
+  Text,
+  UIManager,
+  View,
 } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '../stores/authStore';
-import { MOCK_EVENTS } from '../data/mockData';
-import type { EventSummary } from '../types';
-import { theme } from '../theme';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AnimatedCard } from '../components/AnimatedCard';
+import { AnimatedButton } from '../components/AnimatedButton';
+import { ProgressBar } from '../components/ProgressBar';
+import { COLORS, SPACING } from '../theme';
+import type { EventItem } from '../types';
+import type { RootStackParamList } from '../navigation/types';
 
-// Simula una llamada de red al catálogo interno de producciones.
-// (En la Semana 05 esta misma lista se sirvió con Axios + TanStack Query real;
-// aquí se conserva el patrón de useQuery para mantener loading/error consistentes.)
-async function fetchProductions(): Promise<EventSummary[]> {
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return MOCK_EVENTS;
+// Android requiere este flag para habilitar LayoutAnimation.
+// Debe llamarse fuera del componente, a nivel de módulo.
+if (Platform.OS === 'android') {
+  UIManager.setLayoutAnimationEnabledExperimental?.(true);
 }
 
-export function HomeScreen(): React.JSX.Element {
-  const user = useAuthStore((state) => state.user);
+const SAMPLE_EVENTS: EventItem[] = [
+  {
+    id: 'evt-101',
+    name: 'Festival Neon Lights 2026',
+    client: 'LiveNation Colombia',
+    category: 'Festival',
+    location: 'Centro de Eventos Valle del Pacífico, Cali',
+    date: '25 Oct 2026',
+    budget: '$ 340.000.000 COP',
+    capacity: 18000,
+    ticketsSold: 14400,
+    progress: 0.8,
+  },
+  {
+    id: 'evt-102',
+    name: 'Gala Anual Tech Summit',
+    client: 'Globant Enterprise',
+    category: 'Conferencia',
+    location: 'Hotel Grand Hyatt, Bogotá',
+    date: '12 Nov 2026',
+    budget: '$ 128.000.000 COP',
+    capacity: 1500,
+    ticketsSold: 675,
+    progress: 0.45,
+  },
+  {
+    id: 'evt-103',
+    name: 'Boda Real Cardoza & Silva',
+    client: 'Familia Cardoza',
+    category: 'Boda',
+    location: 'Hacienda San Rafael, Sopó',
+    date: '05 Dic 2026',
+    budget: '$ 98.000.000 COP',
+    capacity: 350,
+    ticketsSold: 70,
+    progress: 0.2,
+  },
+  {
+    id: 'evt-104',
+    name: 'Lanzamiento Corporativo BMW iX',
+    client: 'BMW Group Colombia',
+    category: 'Corporativo',
+    location: 'Club El Nogal, Bogotá',
+    date: '28 Feb 2027',
+    budget: '$ 180.000.000 COP',
+    capacity: 600,
+    ticketsSold: 390,
+    progress: 0.65,
+  },
+];
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['home-productions'],
-    queryFn: fetchProductions,
-  });
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-  if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.brand} />
-      </View>
+export function HomeScreen({ navigation }: Props): React.JSX.Element {
+  const [events, setEvents] = useState<EventItem[]>(SAMPLE_EVENTS);
+
+  // Un Animated.Value por evento para la entrada en cascada.
+  const itemAnims = useRef(SAMPLE_EVENTS.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    Animated.stagger(
+      80,
+      itemAnims.map((anim) =>
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ),
+    ).start();
+  }, [itemAnims]);
+
+  const handleRemoveEvent = (id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setEvents((prev) => prev.filter((event) => event.id !== id));
+  };
+
+  const handleAddEvent = () => {
+    const capacity = 500 + Math.round(Math.random() * 2000);
+    const ticketsSold = Math.round(capacity * Math.random());
+    const newEvent: EventItem = {
+      id: Date.now().toString(),
+      name: `Nueva Producción ${events.length + 1}`,
+      client: 'Cliente por confirmar',
+      category: 'Corporativo',
+      location: 'Por definir',
+      date: 'Por definir',
+      budget: '$ 0 COP',
+      capacity,
+      ticketsSold,
+      progress: capacity > 0 ? ticketsSold / capacity : 0,
+    };
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setEvents((prev) => [...prev, newEvent]);
+  };
+
+  const renderItem = ({ item, index }: { item: EventItem; index: number }) => {
+    // Los eventos añadidos dinámicamente no tienen anim de entrada asociado
+    // (solo la carga inicial se anima en cascada); se muestran directamente.
+    const anim = itemAnims[index];
+
+    const content = (
+      <AnimatedCard
+        onPress={() => navigation.navigate('Detail', { eventId: item.id })}
+        style={styles.card}
+      >
+        <View style={styles.badgeRow}>
+          <Text style={styles.categoryBadge}>{item.category}</Text>
+        </View>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemDescription}>Cliente: {item.client}</Text>
+        <ProgressBar
+          progress={item.progress}
+          label={`Aforo vendido (${item.ticketsSold}/${item.capacity})`}
+        />
+        <AnimatedButton
+          label="Eliminar"
+          variant="success"
+          onPress={() => handleRemoveEvent(item.id)}
+        />
+      </AnimatedCard>
     );
-  }
 
-  if (isError) {
+    if (!anim) {
+      return content;
+    }
+
     return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>No se pudo cargar el catálogo de producciones</Text>
-      </View>
+      <Animated.View
+        style={{
+          opacity: anim,
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
+        }}
+      >
+        {content}
+      </Animated.View>
     );
-  }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>
-          Hola, {user?.firstName || user?.username} 👋
-        </Text>
-        <Text style={styles.subtitle}>
-          {user?.role} · {user?.managedEventsCount} producciones a tu cargo
-        </Text>
-      </View>
-
+    <SafeAreaView style={styles.container}>
       <FlatList
-        data={data}
+        data={events}
         keyExtractor={(item) => item.id}
+        renderItem={renderItem}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.cardTopRow}>
-              <Text style={styles.categoryBadge}>{item.category}</Text>
-              <Text style={styles.statusBadge}>{item.status}</Text>
-            </View>
-            <Text style={styles.itemTitle}>{item.name}</Text>
-            <Text style={styles.itemSubtitle}>Cliente: {item.client}</Text>
-            <View style={styles.cardFooter}>
-              <Text style={styles.itemMeta}>{item.date}</Text>
-              <Text style={styles.itemBudget}>{item.budget}</Text>
-            </View>
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text style={styles.title}>Productora de Eventos</Text>
+            <Text style={styles.subtitle}>{events.length} producciones activas</Text>
           </View>
-        )}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No hay producciones para mostrar</Text>
+        }
+        ListFooterComponent={
+          <View style={styles.footer}>
+            <AnimatedButton label="+ Añadir evento" onPress={handleAddEvent} />
+          </View>
         }
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    padding: theme.spacing.md,
-    paddingTop: theme.spacing.lg,
-    gap: theme.spacing.xs,
-  },
-  greeting: {
-    fontSize: theme.fontSize.xl,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  subtitle: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+    backgroundColor: COLORS.background,
   },
   list: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.sm,
+    padding: SPACING.xl,
+    gap: SPACING.md,
+  },
+  header: {
+    marginBottom: SPACING.md,
+  },
+  title: {
+    color: COLORS.text,
+    fontSize: 26,
+    fontWeight: '700',
+  },
+  subtitle: {
+    color: COLORS.textMuted,
+    fontSize: 13,
+    marginTop: 2,
   },
   card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-    gap: theme.spacing.xs,
-    marginBottom: theme.spacing.sm,
+    gap: SPACING.sm,
   },
-  cardTopRow: {
+  badgeRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   categoryBadge: {
-    fontSize: theme.fontSize.xs,
+    color: COLORS.accent,
+    fontSize: 11,
     fontWeight: '700',
-    color: theme.colors.brand,
     textTransform: 'uppercase',
   },
-  statusBadge: {
-    fontSize: theme.fontSize.xs,
+  itemName: {
+    color: COLORS.text,
+    fontSize: 16,
     fontWeight: '600',
-    color: theme.colors.textSecondary,
   },
-  itemTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: '600',
-    color: theme.colors.text,
+  itemDescription: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
   },
-  itemSubtitle: {
-    fontSize: theme.fontSize.sm,
-    color: theme.colors.textSecondary,
+  separator: {
+    height: SPACING.md,
   },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: theme.spacing.xs,
-  },
-  itemMeta: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textMuted,
-  },
-  itemBudget: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: '700',
-    color: theme.colors.success,
-  },
-  emptyText: {
-    color: theme.colors.textMuted,
-    textAlign: 'center',
-    marginTop: theme.spacing.xl,
-  },
-  errorText: {
-    color: theme.colors.danger,
-    fontSize: theme.fontSize.md,
+  footer: {
+    marginTop: SPACING.xl,
   },
 });

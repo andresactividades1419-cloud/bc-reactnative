@@ -1,86 +1,46 @@
-# Semana 08 — Productora de Eventos (Autenticación Completa)
+# Semana 09 — Animaciones Básicas (Productora de Eventos)
 
-> **Aprendiz:** ANDRES FELIPE FERNANDEZ CARDOZA
-> **Ficha:** 3228970
-> **Bootcamp:** `bc-reactnative` — Semana 08 (Autenticación JWT completa)
+## Descripción del Dominio
 
----
-
-## Descripción del Dominio & Arquitectura de Autenticación
-
-**Productora de Eventos**: acceso protegido para el equipo de producción (coordinadores y productores) que gestiona conciertos, festivales, bodas, conferencias y eventos corporativos.
-
-Esta semana se implementa el flujo de **autenticación JWT completa**, con separación estricta entre:
-- **Tokens (SecureStore):** access token y refresh token — nunca en AsyncStorage ni en texto plano.
-- **Estado de sesión (Zustand + persist):** solo `user` e `isAuthenticated` se persisten en AsyncStorage vía `partialize`; los tokens quedan fuera del store.
-- **Navegación condicional:** `AuthNavigator` (Login/Registro) cuando no hay sesión, `AppNavigator` (Producciones/Perfil) cuando sí la hay.
-
-**API de autenticación:** `dummyjson.com/auth` (login, refresh y `/auth/me`). Credenciales de prueba: `username: emilys` / `password: emilyspass`.
+Catálogo de producciones de la productora, con animaciones aplicadas para reforzar la experiencia de navegación: entrada en cascada del listado, feedback táctil en las tarjetas, y una barra de progreso animada que muestra el aforo vendido de cada evento (entradas vendidas / aforo máximo).
 
 ---
 
-## Características Implementadas
+## Animaciones Implementadas
 
-### 1. Autenticación base (obligatorio)
-- **LoginScreen:** formulario `username` + `password` con React Hook Form + Zod (`loginSchema`), llama a `useAuthStore.login()`.
-- **RegisterScreen:** formulario `username`, `email`, `password` y `confirmPassword` (con `.refine` para validar que coincidan), llama a `useAuthStore.register()`.
-- **`useAuthStore` (Zustand):** acciones `login()`, `register()`, `logout()` y `refreshTokens()` completamente implementadas.
-- **Tokens en SecureStore:** `src/services/tokenService.ts` guarda y lee `accessToken`/`refreshToken` exclusivamente con `SecureStore.setItemAsync` / `getItemAsync` / `deleteItemAsync`.
-- **Navegación condicional:** `RootNavigator.tsx` selecciona `AuthNavigator` o `AppNavigator` según `isAuthenticated`, sin navegación manual desde las pantallas.
-- **ProfileScreen:** muestra nombre, correo, usuario, ID, rol y producciones a cargo del usuario autenticado.
+1. **Entrada en `DetailScreen`** (`Animated.parallel`): al abrir la ficha de un evento, el contenido aparece con fade in (opacity 0→1) + slide up (translateY 30→0) en 500ms.
+2. **Feedback táctil en `AnimatedCard`** (`Animated.spring`): cada tarjeta de evento se comprime a escala 0.95 al presionar y rebota de vuelta a 1 al soltar.
+3. **Barra de progreso en `ProgressBar`** (`interpolate`): el ancho y el color del aforo vendido se animan de 0% a 100%, pasando de rojo (poco vendido) a amarillo a verde (casi lleno), en 800ms.
+4. **Entrada en cascada en `HomeScreen`** (`Animated.stagger(80, ...)`): las tarjetas de eventos aparecen una tras otra al cargar el catálogo.
+5. **`LayoutAnimation` al agregar/eliminar eventos**: al presionar "Eliminar" en una producción o "+ Añadir evento", la transición de la lista se anima suavemente (`LayoutAnimation.Presets.easeInEaseOut`), incluyendo el flag de Android (`UIManager.setLayoutAnimationEnabledExperimental`).
 
-### 2. Adaptación al dominio (obligatorio)
-- **HomeScreen ("Producciones"):** catálogo de eventos de la productora (nombre, cliente, categoría, fecha, presupuesto en COP y estado), cargado con `useQuery` de TanStack Query.
-- **ProfileScreen:** además de los datos básicos, muestra `role` (ej. *Coordinador de Producción*, *Productor Junior*) y `managedEventsCount` (producciones actualmente a su cargo) — campos propios de `AuthUser` extendidos para este dominio.
-
-### 3. Interceptor 401 → refresh automático (mejora opcional)
-- `src/services/api.ts` implementa el interceptor de respuesta: si una petición falla con `401` y no se ha reintentado antes, lee el `refreshToken` de SecureStore, pide un nuevo `accessToken` con `authService.refreshTokens()`, lo guarda y reintenta la petición original.
-- El `import('./authService')` dentro del interceptor es diferido a propósito para evitar el ciclo `api.ts` ↔ `authService.ts` (ambos módulos se necesitan mutuamente).
-
-### 4. Logout accesible (mejora opcional)
-- Botón "Cerrar sesión" en `ProfileScreen`, con confirmación (`Alert.alert`) antes de limpiar tokens y estado.
-
-### 5. TypeScript Estricto
-- Interfaces del dominio (`AuthUser`, `AuthTokens`, `EventSummary`) explícitas, sin `any`.
-- `refreshTokens()` en `authService.ts` retorna `AuthTokens` (no `AuthResponse`) porque el endpoint real de dummyjson solo devuelve los tokens, no el perfil completo — tipado ajustado a la respuesta real de la API.
+Todas las animaciones de transformación (`opacity`, `scale`, `translateY`) usan `useNativeDriver: true`. Solo `width`/`backgroundColor` en `ProgressBar` usan `useNativeDriver: false`, porque esas propiedades no son animables en el hilo nativo.
 
 ---
 
 ## Estructura del Proyecto
 
 ```
-├── App.tsx                       # QueryClientProvider + RootNavigator
-├── app.json                      # Configuración Expo
-├── package.json                  # Dependencias (auth-session, secure-store, RHF, zod)
-├── tsconfig.json                 # Configuración TypeScript estricta
-├── README.md                     # Documentación de la entrega
+├── App.tsx
+├── app.json
+├── package.json
+├── tsconfig.json
+├── README.md
 └── src/
     ├── components/
-    │   └── FormField.tsx         # Input reutilizable con label + error inline
-    ├── schemas/
-    │   └── authSchema.ts         # Esquemas Zod de login y registro
-    ├── services/
-    │   ├── tokenService.ts       # Wrapper de SecureStore (access + refresh token)
-    │   ├── authService.ts        # login / register / refreshTokens / getProfile
-    │   └── api.ts                # Instancia Axios con interceptor de refresh 401
-    ├── stores/
-    │   └── authStore.ts          # Zustand + persist (user, isAuthenticated) + SecureStore
+    │   ├── AnimatedCard.tsx      # spring scale al presionar
+    │   ├── AnimatedButton.tsx    # timing + spring en tap
+    │   └── ProgressBar.tsx       # interpolate de ancho y color
     ├── navigation/
-    │   ├── types.ts              # AuthStackParamList y AppStackParamList tipados
-    │   ├── AuthNavigator.tsx     # Stack: Login, Register
-    │   ├── AppNavigator.tsx      # Tabs: Producciones, Mi Perfil
-    │   └── RootNavigator.tsx     # Alterna Auth/App según isAuthenticated
+    │   ├── types.ts
+    │   └── RootNavigator.tsx
     ├── screens/
-    │   ├── LoginScreen.tsx
-    │   ├── RegisterScreen.tsx
-    │   ├── HomeScreen.tsx        # Catálogo de producciones del dominio
-    │   └── ProfileScreen.tsx     # Datos del usuario + logout
-    ├── data/
-    │   └── mockData.ts           # Catálogo de producciones (dominio)
+    │   ├── HomeScreen.tsx        # stagger + LayoutAnimation
+    │   └── DetailScreen.tsx      # fade in + slide up al montar
     ├── theme/
-    │   └── index.ts              # Tokens de diseño (misma paleta de semanas anteriores)
+    │   └── index.ts
     └── types/
-        └── index.ts              # Tipos de auth y del dominio
+        └── index.ts
 ```
 
 ---
@@ -88,15 +48,11 @@ Esta semana se implementa el flujo de **autenticación JWT completa**, con separ
 ## Cómo ejecutar
 
 ```bash
-# 1. Instalar dependencias
 pnpm install
-# (o npm install)
-
-# 2. Iniciar servidor Expo
 npx expo start
-
-# 3. Presionar 'a' para Android, 'i' para iOS simulador o escanear el QR con Expo Go
 ```
+
+Escanea el QR con Expo Go o presiona `i` (iOS) / `a` (Android) en el simulador.
 
 Para verificar que el código cumple con TypeScript estricto:
 ```bash
